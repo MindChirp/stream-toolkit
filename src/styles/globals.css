@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --font-poppins:
+    var(--font-poppins), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-kameron: var(--font-kameron);
+  --color-secondary: #f8f3ee;
+  --color-primary: #6dbcb6;
+  --color-background: #ffffff;
+  --color-tertiary: #e3d0bc;
+}
