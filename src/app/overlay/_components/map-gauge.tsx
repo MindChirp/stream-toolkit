@@ -1,5 +1,5 @@
-import GoogleMapReact from "google-map-react";
 import Image from "next/image";
+// const MapGeoJSON = require("../../../../public/maps/norway.geo.json") as object;
 
 type MapGaugeProps = {
   lat: number;
@@ -8,8 +8,20 @@ type MapGaugeProps = {
 const MapGauge = ({ lat, lng }: MapGaugeProps) => {
   return (
     <div className="flex h-[9.5rem] w-[9.5rem] items-center justify-center overflow-hidden rounded-full bg-black/50">
-      <GoogleMapReact
-        yesIWantToUseGoogleMapApiInternals
+      <Image
+        src="/images/map-placeholder.png"
+        alt="Map"
+        width={1000}
+        height={1000}
+        className="h-full w-full object-cover"
+      />
+      {/* <GoogleMapReact
+        draggable={false}
+        options={{
+          fullscreenControl: false,
+          disableDefaultUI: true,
+          keyboardShortcuts: false,
+        }}
         bootstrapURLKeys={{ key: "" }}
         defaultCenter={{
           lat,
@@ -18,7 +30,7 @@ const MapGauge = ({ lat, lng }: MapGaugeProps) => {
         zoom={10}
       >
         <RocketIcon lat={lat} lng={lng} />
-      </GoogleMapReact>
+      </GoogleMapReact> */}
       {/* <h2 className="w-fit text-center text-white">MAPS PLACEHOLDER</h2> */}
     </div>
   );
@@ -27,7 +39,7 @@ const MapGauge = ({ lat, lng }: MapGaugeProps) => {
 const RocketIcon = ({}: { lat: number; lng: number }) => {
   return (
     <Image
-      src="/images/rocket.png"
+      src="/images/rocket.webp"
       alt="Rocket"
       width={500}
       height={500}
