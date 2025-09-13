@@ -1,15 +1,15 @@
 "use client";
 import Group from "@/app/_components/group";
 import { api } from "@/trpc/react";
-import { cn } from "@/utils/cn";
 import Header from "components/header";
 import { Loader } from "lucide-react";
-import React from "react";
-import TimerControls from "./_components/timer-controls";
 import ControlButton from "./_components/control-button";
+import TimerControls from "./_components/timer-controls";
+import TelemetrySource from "./_components/telemetry-source";
 
 const ControlCenter = () => {
   const { mutate, isPending } = api.socket.setOverlayMode.useMutation();
+  const { data: overlayState } = api.socket.onOverlayState.useSubscription();
   return (
     <div className="flex w-full flex-col gap-5">
       {isPending && (
@@ -17,29 +17,56 @@ const ControlCenter = () => {
           <Loader className="animate-spin" />
         </div>
       )}
-      <Header>Control center</Header>
+      <Header>Control Center</Header>
       <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-2">
-        <Group title="Overlay mode">
+        <Group title="Overlay Mode">
           <div className="grid min-w-96 grid-cols-2 gap-2.5">
-            <ControlButton onClick={() => mutate({ mode: "early-countdown" })}>
+            <ControlButton
+              onClick={() => mutate({ mode: "early-countdown" })}
+              variant={
+                overlayState?.state === "early-countdown"
+                  ? "default"
+                  : "secondary"
+              }
+            >
               Early countdown
             </ControlButton>
-            <ControlButton onClick={() => mutate({ mode: "final-countdown" })}>
+            <ControlButton
+              onClick={() => mutate({ mode: "final-countdown" })}
+              variant={
+                overlayState?.state === "final-countdown"
+                  ? "default"
+                  : "secondary"
+              }
+            >
               Final countdown
             </ControlButton>
-            <ControlButton onClick={() => mutate({ mode: "in-flight" })}>
+            <ControlButton
+              onClick={() => mutate({ mode: "in-flight" })}
+              variant={
+                overlayState?.state === "in-flight" ? "default" : "secondary"
+              }
+            >
               In-flight
             </ControlButton>
-            <ControlButton onClick={() => mutate({ mode: "post-flight" })}>
+            <ControlButton
+              onClick={() => mutate({ mode: "post-flight" })}
+              variant={
+                overlayState?.state === "post-flight" ? "default" : "secondary"
+              }
+            >
               Post-flight
             </ControlButton>
           </div>
         </Group>
-        <Group title="Timer controls">
+        <Group title="Timer Controls">
           <TimerControls />
         </Group>
+        <Group title="Telemetry Setup">
+          <TelemetrySource />
+        </Group>
         <Group
-          title="Danger area"
+          title="Danger Area"
           variant="danger"
           className="flex flex-row flex-wrap gap-2.5 xl:col-span-2"
         >

@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { cn } from "@/utils/cn";
+import type { ComponentProps } from "react";
 
 const ControlButton = ({
-  className,
-  active,
   ...props
-}: React.HTMLAttributes<HTMLButtonElement> & { active?: boolean }) => {
-  return <Button {...props} />;
+}: ComponentProps<typeof Button> & { active?: boolean }) => {
+  return <Button variant="secondary" {...props} />;
 };
 
 export default ControlButton;

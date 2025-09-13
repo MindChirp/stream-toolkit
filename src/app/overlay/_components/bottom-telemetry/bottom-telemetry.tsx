@@ -1,20 +1,34 @@
 "use client";
+
 import type { State } from "@/types/states";
 import { cn } from "@/utils/cn";
 import Header from "components/header";
-import { AnimatePresence, motion } from "motion/react";
-import { type ComponentProps } from "react";
-import Gauge from "./gauge";
-import MapGauge from "./map-gauge";
-import Navball from "./navball";
 import SlideAnimation from "components/slide-animation";
+import { PauseIcon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { Azeret_Mono } from "next/font/google";
+import { type ComponentProps } from "react";
+import Gauge from "../gauge";
+import MapGauge from "../map-gauge";
+import Navball from "../navball";
+import { parseTime } from "./utils/parse-time";
 
 type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
-  state: State;
+  overlayState: State;
+  clockState: {
+    time: string;
+    state: "hold" | "active";
+  };
 };
+
+const azeretMono = Azeret_Mono({
+  variable: "--font-azeret-mono",
+  subsets: ["latin"],
+});
 const BottomTelemetry = ({
   className,
-  state,
+  overlayState,
+  clockState,
   ...props
 }: BottomTelemetryProps) => {
   return (
@@ -53,7 +67,8 @@ const BottomTelemetry = ({
       <div className="flex h-56 w-full flex-row items-center justify-evenly">
         <div className="flex w-full flex-row gap-10" key="telemetry-wrapper">
           <AnimatePresence>
-            {(state === "in-flight" || state === "final-countdown") && (
+            {(overlayState === "in-flight" ||
+              overlayState === "final-countdown") && (
               <motion.div
                 key="left-telemetry"
                 className="flex w-full flex-row justify-end gap-10 pr-10"
@@ -69,18 +84,46 @@ const BottomTelemetry = ({
           </AnimatePresence>
         </div>
 
-        <Header
-          key="countdown"
-          className="font-poppins! min-w-fit px-20 text-center tracking-wide text-white"
-        >
-          T-00:30:00
-        </Header>
+        <div className="relative mx-20 w-fit">
+          <AnimatePresence>
+            {clockState.state === "hold" && (
+              <motion.span
+                key="hold-icon"
+                className="absolute top-1/2 -left-3 flex size-10 -translate-x-full -translate-y-1/2 items-center justify-center rounded-full bg-black/50"
+                initial={{
+                  opacity: 0,
+                  translateY: 10,
+                }}
+                animate={{ opacity: 1, translateY: 0 }}
+                exit={{ opacity: 0, translateY: -10 }}
+              >
+                <PauseIcon
+                  strokeWidth={1}
+                  color="white"
+                  stroke="transparent"
+                  fill="white"
+                  className="opacity-70"
+                  size={20}
+                />
+              </motion.span>
+            )}
+          </AnimatePresence>
+          <Header
+            key="countdown"
+            className={cn(
+              `${azeretMono.className} relative w-fit font-normal tracking-tighter whitespace-nowrap text-white`,
+            )}
+          >
+            {parseTime(clockState.time)}
+          </Header>
+        </div>
         <div
           key="right-telemetry-wrapper"
           className="flex w-full flex-row gap-10"
         >
           <AnimatePresence>
-            {(state === "in-flight" || state === "final-countdown") && (
+            {(overlayState === "in-flight" ||
+              overlayState === "final-countdown") && (
               <motion.div
                 key="right-telemetry"
                 className="flex w-full flex-row justify-start gap-10 pl-10"

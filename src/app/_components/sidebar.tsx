@@ -1,6 +1,5 @@
 "use client";
 import { cn } from "@/utils/cn";
-import { HomeIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -36,7 +35,19 @@ const Sidebar = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
           to={"/admin/controlcenter"}
           active={pathname === "/kontrollsenter"}
         >
-          Kontrollsenter
+          Overlay controls
+        </SidebarButton>
+        <SidebarButton
+          to={"/admin/controlcenter"}
+          active={pathname === "/kontrollsenter"}
+        >
+          Mission control
+        </SidebarButton>
+        <SidebarButton
+          to={"/admin/controlcenter"}
+          active={pathname === "/kontrollsenter"}
+        >
+          Engine control
         </SidebarButton>
       </div>
     </div>

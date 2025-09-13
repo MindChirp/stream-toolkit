@@ -4,6 +4,7 @@ import React from "react";
 
 const kameron = Kameron({
   variable: "--font-kameron",
+  subsets: ["latin"],
 });
 
 const Header = ({

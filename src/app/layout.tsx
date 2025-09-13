@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 const poppins = Poppins({
   variable: "--font-poppins",
   weight: "400",
+  subsets: ["latin"],
 });
 
 export default function RootLayout({
@@ -22,7 +23,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${poppins.className}`}>
-      <body className="overflow-hidden">
+      <body className="">
         <TRPCReactProvider>
           <HydrateClient>{children}</HydrateClient>
         </TRPCReactProvider>
