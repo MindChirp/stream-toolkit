@@ -8,11 +8,20 @@ const STATE_VALUES = [
   "post-flight",
 ] as const;
 
+const Events = {
+  TELEMETRY: "telemetry",
+  STATE: "state",
+  CLOCK: "clock",
+};
+
+const CLOCK_STATE_VALUES = ["hold", "active"] as const;
+
 type Test = {
-  type: "state" | "telemetry";
+  type: "state" | "telemetry" | "clock";
 } & (
   | { type: "state"; state: (typeof STATE_VALUES)[number] }
   | { type: "telemetry"; data: object }
+  | { type: "clock"; time: string; state: (typeof CLOCK_STATE_VALUES)[number] }
 );
 
 const ee = new EventEmitter();
@@ -54,5 +63,16 @@ export const realtimeRouter = createTRPCRouter({
       } as Test);
 
       return;
+    }),
+  setClock: publicProcedure
+    .input(
+      z.object({
+        time: z.string().regex(/^\d{6}$/, "Time must be in HHMMSS format"),
+        state: z.enum(CLOCK_STATE_VALUES),
+      }),
+    )
+    .mutation(({ input }) => {
+      console.log("Setting clock to:", input.time, "with state:", input.state);
+      ee.emit("clock-state");
     }),
 });
