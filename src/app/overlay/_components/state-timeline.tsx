@@ -7,6 +7,7 @@ type StateTimelineProps = {
 };
 
 const StateTimeline = ({ state, ...props }: StateTimelineProps) => {
+  return undefined;
   return (
     <div className="absolute top-0 flex h-40 w-full flex-row items-start justify-center gap-5 bg-gradient-to-b from-black to-transparent pt-5">
       <div className="flex h-20 flex-row items-center">

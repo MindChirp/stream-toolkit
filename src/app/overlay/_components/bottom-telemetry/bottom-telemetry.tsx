@@ -1,6 +1,8 @@
 "use client";
 
 import type { State } from "@/types/states";
+import NumberFlow from "@number-flow/react";
+import AnimatedNumbers from "react-animated-numbers";
 import { cn } from "@/utils/cn";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
@@ -108,13 +110,23 @@ const BottomTelemetry = ({
               </motion.span>
             )}
           </AnimatePresence>
+
           <Header
             key="countdown"
             className={cn(
               `${azeretMono.className} relative w-fit font-normal tracking-tighter whitespace-nowrap text-white`,
             )}
           >
-            {parseTime(clockState.time)}
+            {/* {clockState.time} */}
+            {clockState.time.slice(0, 2)}
+            <NumberFlow value={parseInt(clockState.time.slice(2, 3))} />
+            <NumberFlow value={parseInt(clockState.time.slice(3, 4))} />
+            :
+            <NumberFlow value={parseInt(clockState.time.slice(4, 5))} />
+            <NumberFlow value={parseInt(clockState.time.slice(5, 6))} />
+            :
+            <NumberFlow value={parseInt(clockState.time.slice(6, 7))} />
+            <NumberFlow value={parseInt(clockState.time.slice(7, 8))} />
           </Header>
         </div>
         <div
