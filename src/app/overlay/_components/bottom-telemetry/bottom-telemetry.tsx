@@ -141,10 +141,10 @@ const BottomTelemetry = ({
                 className="flex w-full flex-row justify-start gap-10 pl-10"
               >
                 <SlideAnimation transition={{ delay: 0.3 }}>
-                  <Gauge label="speed" value={4000} unit="km/h" />
+                  <Gauge label="speed" value={0} unit="km/h" />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 0.45 }}>
-                  <Gauge label="altitude" value={5000} unit="meters" />
+                  <Gauge label="altitude" value={0} unit="meters" />
                 </SlideAnimation>
               </motion.div>
             )}

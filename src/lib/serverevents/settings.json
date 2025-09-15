@@ -1,0 +1,480 @@
+{
+  "FC": {
+    "ip": "10.19.0.111",
+    "data_streams": [
+      {
+        "id": "FC_super",
+        "bidirectional": true,
+        "buffer_size": 500,
+        "local_port": 8080,
+        "remote_port": 136,
+        "type": "DGRAM",
+        "format": "raw",
+        "keys": [
+          "alignment",
+          "imu1_accel_x",
+          "imu1_accel_y",
+          "imu1_accel_z",
+          "imu1_gyro_x",
+          "imu1_gyro_y",
+          "imu1_gyro_z",
+          "imu2_accel_x",
+          "imu2_accel_y",
+          "imu2_accel_z",
+          "baro_pressure",
+          "baro_temperature",
+          "baro_altitude",
+          "hum_pressure",
+          "hum_temperature",
+          "hum_humidity",
+          "hum_dewpoint",
+          "mag_x",
+          "mag_y",
+          "mag_z",
+          "mag_temperature",
+          "fixType",
+          "year",
+          "month",
+          "day",
+          "hour",
+          "min",
+          "sec",
+          "longitude",
+          "latitude",
+          "height",
+          "hacc",
+          "vacc",
+          "veln",
+          "vele",
+          "veld",
+          "gps_timestamp",
+          "time",
+          "week",
+          "status",
+          "yaw",
+          "pitch",
+          "roll",
+          "x",
+          "y",
+          "z",
+          "velx",
+          "vely",
+          "velz",
+          "attUncertainty",
+          "posUncertainty",
+          "velUncertainty",
+          "fsm_state",
+          "acc_z_moving_average",
+          "mcu_time",
+          "kalman_altitude",
+          "kalman_velocity",
+          "recovery_pressure"
+        ],
+        "fstring": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "aggregation_factor": 1,
+        "append_ts": true,
+        "conversion_fn": null
+      },
+      {
+        "id": "FC_super_xbee",
+        "bidirectional": false,
+        "buffer_size": 500,
+        "local_port": "COM12",
+        "remote_port": 136,
+        "type": "XBEE",
+        "format": "raw",
+        "keys": [
+          "alignment",
+          "imu1_accel_x",
+          "imu1_accel_y",
+          "imu1_accel_z",
+          "imu1_gyro_x",
+          "imu1_gyro_y",
+          "imu1_gyro_z",
+          "imu2_accel_x",
+          "imu2_accel_y",
+          "imu2_accel_z",
+          "baro_pressure",
+          "baro_temperature",
+          "baro_altitude",
+          "longitude",
+          "latitude",
+          "height",
+          "hacc",
+          "vacc",
+          "veln",
+          "vele",
+          "veld",
+          "gps_timestamp",
+          "fsm_state",
+          "acc_z_moving_average",
+          "mcu_time",
+          "kalman_altitude",
+          "kalman_velocity",
+          "recovery_pressure"
+        ],
+        "fstring": "dddddddddddddddddddddddddddd",
+        "aggregation_factor": 1,
+        "append_ts": true,
+        "conversion_fn": null
+      }
+    ]
+  },
+
+  "ECU": {
+    "ip": "10.19.36.11",
+    "data_streams": [
+      {
+        "id": "ECU_ADC",
+        "bidirectional": false,
+        "buffer_size": 5000,
+        "local_port": 9999,
+        "remote_port": 8888,
+        "type": "DGRAM",
+        "format": "raw",
+        "keys": [
+          "ox_injector",
+          "burn_chamber",
+          "fuel_injector",
+          "load_cell",
+          "fuel_tank",
+          "regulator",
+          "ox_tank",
+          "n2_tank",
+          "micros"
+        ],
+        "fstring": "HHHHHHHHI",
+        "aggregation_factor": 50,
+        "append_ts": true,
+        "conversion_fn": "adc_cv"
+      },
+      {
+        "id": "ECU_thermo",
+        "bidirectional": false,
+        "buffer_size": 500,
+        "local_port": 9998,
+        "remote_port": 8888,
+        "type": "DGRAM",
+        "format": "raw",
+        "keys": [
+          "ox_tank_bot",
+          "fuel_injector",
+          "ox_injector",
+          "fuel_tank",
+          "ox_tank_top",
+          "micros"
+        ],
+        "fstring": "fffffQ",
+        "aggregation_factor": 1,
+        "append_ts": true,
+        "conversion_fn": null
+      },
+      {
+        "id": "ECU_cmd",
+        "bidirectional": true,
+        "buffer_size": 10,
+        "local_port": null,
+        "remote_port": 10023,
+        "type": "STREAM",
+        "reconnect_time": 5,
+        "format": "raw",
+        "keys": [
+          "state",
+          "state_time",
+          "override",
+          "fsm_servo_enabled",
+          "fsm_sensor_data",
+          "servo1",
+          "servo1_change_time",
+          "servo1_enabled",
+          "servo1_enabled_time",
+          "ox_fill_valve_pos",
+          "ox_fill_valve_change_time",
+          "ox_fill_valve_enabled",
+          "ox_fill_valve_enabled_time",
+          "purge_valve_pos",
+          "purge_valve_change_time",
+          "purge_valve_enabled",
+          "purge_valve_enabled_time",
+          "pressurizing_valve_pos",
+          "pressurizing_valve_change_time",
+          "pressurizing_valve_enabled",
+          "pressurizing_valve_enabled_time",
+          "main_ox_valve_pos",
+          "main_ox_valve_change_time",
+          "main_ox_valve_enabled",
+          "main_ox_valve_enabled_time",
+          "main_fuel_valve_pos",
+          "main_fuel_valve_change_time",
+          "main_fuel_valve_enabled",
+          "main_fuel_valve_enabled_time",
+          "solenoid1",
+          "solenoid1_change_time",
+          "fuelvent",
+          "fuelvent_change_time",
+          "oxvent",
+          "oxvent_change_time"
+        ],
+        "fstring": "BI???HI?IHI?IHI?IHI?IHI?IHI?I?I?I?I",
+        "aggregation_factor": 1,
+        "append_ts": true,
+        "conversion_fn": null
+      },
+      {
+        "id": "ECU_servo",
+        "bidirectional": false,
+        "buffer_size": 500,
+        "local_port": 9996,
+        "remote_port": 8888,
+        "type": "STIAN",
+        "format": "raw",
+        "keys": ["ox_pwm", "ox_ts"],
+        "keys_2": ["fuel_pwm", "fuel_ts"],
+        "fstring": "IIII",
+        "aggregation_factor": 40,
+        "append_ts": true,
+        "conversion_fn": null
+      },
+      {
+        "id": "ECU_string",
+        "bidirectional": false,
+        "buffer_size": 1,
+        "local_port": 9997,
+        "remote_port": 8888,
+        "type": "STR",
+        "format": "raw",
+        "keys": ["string"],
+        "fstring": "s",
+        "aggregation_factor": 1,
+        "append_ts": true,
+        "conversion_fn": null
+      },
+      {
+        "id": "ECU_state",
+        "bidirectional": false,
+        "buffer_size": 10,
+        "local_port": 9995,
+        "remote_port": 10023,
+        "type": "DGRAM",
+        "reconnect_time": 5,
+        "format": "raw",
+        "keys": [
+          "state",
+          "state_time",
+          "override",
+          "fsm_servo_enabled",
+          "fsm_sensor_data",
+          "buzzer_muted",
+          "servo1",
+          "servo1_change_time",
+          "servo1_enabled",
+          "servo1_enabled_time",
+          "ox_fill_valve_pos",
+          "ox_fill_valve_change_time",
+          "ox_fill_valve_enabled",
+          "ox_fill_valve_enabled_time",
+          "purge_valve_pos",
+          "purge_valve_change_time",
+          "purge_valve_enabled",
+          "purge_valve_enabled_time",
+          "pressurizing_valve_pos",
+          "pressurizing_valve_change_time",
+          "pressurizing_valve_enabled",
+          "pressurizing_valve_enabled_time",
+          "main_ox_valve_pos",
+          "main_ox_valve_change_time",
+          "main_ox_valve_enabled",
+          "main_ox_valve_enabled_time",
+          "main_fuel_valve_pos",
+          "main_fuel_valve_change_time",
+          "main_fuel_valve_enabled",
+          "main_fuel_valve_enabled_time",
+          "solenoid1",
+          "solenoid1_change_time",
+          "fuelvent",
+          "fuelvent_change_time",
+          "oxvent",
+          "oxvent_change_time"
+        ],
+        "fstring": "BI????HI?IHI?IHI?IHI?IHI?IHI?I?I?I?I",
+        "aggregation_factor": 1,
+        "append_ts": true,
+        "conversion_fn": null
+      }
+    ],
+    "actuatorList": {
+      "FuelVent": {
+        "name": "Fuel Venting Valve [0]",
+        "ECU_Character": 0,
+        "Servo": false,
+        "default": "Open"
+      },
+      "OxVent": {
+        "name": "Ox Venting Valve [1]",
+        "ECU_Character": 1,
+        "Servo": false,
+        "default": "Open"
+      },
+      "Pressurizing": {
+        "name": "Pressurizing Valve [2]",
+        "ECU_Character": 2,
+        "Servo": true,
+        "default": "Closed"
+      },
+      "Purge": {
+        "name": "Purge Valve [3]",
+        "ECU_Character": 3,
+        "Servo": true,
+        "default": "Closed"
+      },
+      "FuelMainValve": {
+        "name": "Main Fuel Valve [4]",
+        "ECU_Character": 4,
+        "Servo": true,
+        "default": "Closed"
+      },
+      "OxMainValve": {
+        "name": "Main Ox Valve [5]",
+        "ECU_Character": 5,
+        "Servo": true,
+        "default": "Closed"
+      }
+    },
+    "sensorList": {
+      "pressureSensors": {
+        "OxTankPres": {
+          "name": "Ox Tank Pressure",
+          "unit": "bar",
+          "type": "pres",
+          "packetIndex": 0
+        },
+        "FuelInjPres": {
+          "name": "Fuel Injector Pressure",
+          "unit": "bar",
+          "type": "pres",
+          "packetIndex": 1
+        },
+        "loadCell": {
+          "name": "Load",
+          "unit": "kg",
+          "type": "pres",
+          "packetIndex": 2
+        },
+        "N2TankPres": {
+          "name": "N2 Tank Pressure",
+          "unit": "bar",
+          "type": "pres",
+          "packetIndex": 3
+        },
+        "chamberPres": {
+          "name": "Burnchamber Pressure",
+          "unit": "bar",
+          "type": "pres",
+          "packetIndex": 4
+        },
+        "OxInjPres": {
+          "name": "Ox Injector Pressure",
+          "unit": "bar",
+          "type": "pres",
+          "packetIndex": 5
+        },
+        "FuelTankPres": {
+          "name": "Fuel Tank Pressure",
+          "unit": "bar",
+          "type": "pres",
+          "packetIndex": 6
+        },
+        "sensor8": {
+          "name": "Sensor 8",
+          "unit": "bar",
+          "type": "pres",
+          "packetIndex": 7
+        }
+      },
+      "thermoCouples": {
+        "OxTankTempBot": {
+          "name": "Ox Tank Temperature Bot",
+          "unit": "C",
+          "type": "temp",
+          "packetIndex": 0
+        },
+        "FuelTankTemp": {
+          "name": "Fuel Tank Temperature",
+          "unit": "C",
+          "type": "temp",
+          "packetIndex": 1
+        },
+        "FuelInjectorTemp": {
+          "name": "Fuel Injector Temperature",
+          "unit": "C",
+          "type": "temp",
+          "packetIndex": 3
+        },
+        "oxInjecTemp": {
+          "name": "Ox Injector Temperature",
+          "unit": "C",
+          "type": "temp",
+          "packetIndex": 2
+        }
+      }
+    },
+    "states": {
+      "Safe [1]": {
+        "ECU_Character": 1,
+        "Controllable": true
+      },
+      "Fuel Filling [2]": {
+        "ECU_Character": 2,
+        "Controllable": true
+      },
+      "N2 Setup [3]": {
+        "ECU_Character": 3,
+        "Controllable": true
+      },
+      "Ox Filling [4]": {
+        "ECU_Character": 4,
+        "Controllable": true
+      },
+      "Post Filling [5]": {
+        "ECU_Character": 5,
+        "Controllable": true
+      },
+      "Pressurized [6]": {
+        "ECU_Character": 6,
+        "Controllable": true
+      },
+      "Armed [7]": {
+        "ECU_Character": 7,
+        "Controllable": true
+      },
+      "Burn Wire Detection [8]": {
+        "ECU_Character": 8,
+        "Controllable": false
+      },
+      "Inital Pre-burn [9]": {
+        "ECU_Character": 9,
+        "Controllable": false
+      },
+      "Ramp-up [10]": {
+        "ECU_Character": 10,
+        "Controllable": false
+      },
+      "Full Burn [11]": {
+        "ECU_Character": 11,
+        "Controllable": false
+      },
+      "Shutdown [12]": {
+        "ECU_Character": 12,
+        "Controllable": false
+      },
+      "Purge [13]": {
+        "ECU_Character": 13,
+        "Controllable": false
+      },
+      "Post Burn [14]": {
+        "ECU_Character": 14,
+        "Controllable": false
+      }
+    }
+  }
+}

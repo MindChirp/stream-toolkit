@@ -44,10 +44,6 @@ ClockInstance.timeTickCallback((time) => {
   }
 });
 
-const telemetryCallback = (data: unknown) => {
-  console.log("Received data: ", data);
-};
-
 // Set up an interval to trigger the event emitter every other second
 setInterval(() => {
   const data: Telemetry = {
@@ -134,7 +130,6 @@ export const realtimeRouter = createTRPCRouter({
       try {
         console.log("Setting telemetry source to:", input.source);
         ServerEventListenerInstance.setSource(input.source);
-        ServerEventListenerInstance.onMessage(telemetryCallback);
       } catch (e) {
         console.error("Failed to set telemetry source:", e);
         throw e;
