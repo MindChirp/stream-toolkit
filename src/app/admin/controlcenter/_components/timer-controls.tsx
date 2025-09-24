@@ -26,7 +26,7 @@ const formSchema = z.object({
 });
 
 const TimerControls = () => {
-  const { mutate, isPending } = api.socket.setClock.useMutation();
+  const { mutate, isPending } = api.socket.setClockState.useMutation();
   const { data: time } = api.socket.onClock.useSubscription();
 
   const form = useForm<z.infer<typeof formSchema>>({

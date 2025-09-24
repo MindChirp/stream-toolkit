@@ -5,11 +5,12 @@ import { AnimatePresence } from "motion/react";
 import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
 import SponsorReel from "./_components/sponsor-reel";
 import StateTimeline from "./_components/state-timeline";
+import { useTelemetry } from "@/lib/hooks/useTelemetry";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
   const { data: state } = api.socket.onOverlayState.useSubscription();
-  const { data: telemetry } = api.socket.onTelemetry.useSubscription();
+  const telemetry = useTelemetry();
   const { data: time } = api.socket.onClock.useSubscription();
 
   return (
@@ -25,6 +26,16 @@ const OverlayPage = () => {
 
         {state?.state && state?.state !== "post-flight" && (
           <BottomTelemetry
+            gForce={
+              parseFloat((telemetry?.accelleration as string) ?? 0) / 9.81
+            }
+            speed={telemetry?.velocity as number}
+            altitude={telemetry?.altitude as number}
+            orientation={{
+              pitch: telemetry?.pitch as number,
+              yaw: telemetry?.yaw as number,
+              roll: telemetry?.roll as number,
+            }}
             clockState={{
               time: time?.time ?? "TBD",
               state: time?.state ?? "hold",
@@ -35,7 +46,6 @@ const OverlayPage = () => {
           />
         )}
       </AnimatePresence>
-      {/* {JSON.stringify(data)} */}
     </div>
   );
 };

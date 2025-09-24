@@ -1,8 +1,8 @@
-import EventEmitter, { on } from "events";
-import { createTRPCRouter, publicProcedure } from "../trpc";
-import z from "zod";
 import { Clock as ClockClass } from "@/lib/clock/clock";
-import { ServerEventHandler } from "@/lib/serverevents/serverevents";
+import { ServerEventHandlerRetrofit } from "@/lib/telemetry/telemetry-client-retrofit";
+import EventEmitter, { on } from "events";
+import z from "zod";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 
 const STATE_VALUES = [
   "final-countdown",
@@ -13,7 +13,7 @@ const STATE_VALUES = [
 
 const CLOCK_STATE_VALUES = ["hold", "active"] as const;
 
-type Telemetry = { data: object };
+type Telemetry = Record<string, unknown>;
 type Clock = { time: string; state: (typeof CLOCK_STATE_VALUES)[number] };
 type OverlayState = { state: (typeof STATE_VALUES)[number] };
 
@@ -21,7 +21,7 @@ const ee = new EventEmitter();
 
 const ClockInstance = new ClockClass("T-003000", "hold");
 
-const ServerEventListenerInstance = new ServerEventHandler();
+const ServerEventListenerInstance = new ServerEventHandlerRetrofit();
 
 // Set the timer callback
 ClockInstance.timeTickCallback((time) => {
@@ -30,6 +30,7 @@ ClockInstance.timeTickCallback((time) => {
     state: ClockInstance.getState(),
   } as Clock);
 
+  // Modifies overlay state based on remaining time in countdown
   if (ClockInstance.getRawTime() >= -7 && ClockInstance.getRawTime() <= -3) {
     ee.emit("overlay-state", {
       state: "final-countdown",
@@ -44,17 +45,6 @@ ClockInstance.timeTickCallback((time) => {
   }
 });
 
-// Set up an interval to trigger the event emitter every other second
-setInterval(() => {
-  const data: Telemetry = {
-    data: {
-      title: "Test",
-      description: new Date().toISOString(),
-    },
-  };
-  ee.emit("telemetry", data);
-}, 2000);
-
 export const realtimeRouter = createTRPCRouter({
   onTelemetry: publicProcedure.subscription(async function* (opts) {
     for await (const [data] of on(ee, "telemetry", {
@@ -65,6 +55,8 @@ export const realtimeRouter = createTRPCRouter({
     }
   }),
   onOverlayState: publicProcedure.subscription(async function* (opts) {
+    // Send an initial state
+    ee.emit("overlay-state", {} as OverlayState);
     for await (const [data] of on(ee, "overlay-state", {
       signal: opts.signal,
     })) {
@@ -109,7 +101,6 @@ export const realtimeRouter = createTRPCRouter({
       console.log("Setting clock to:", input.time, "with state:", input.state);
       ClockInstance.setTime(input.time);
 
-      console.log("State: " + input.state);
       if (input.state === "active") {
         ClockInstance.start();
       } else {
@@ -120,16 +111,35 @@ export const realtimeRouter = createTRPCRouter({
         ...input,
       } as Clock);
     }),
-  setTelemetrySource: publicProcedure
+  addTelemetrySource: publicProcedure
     .input(
       z.object({
         source: z.string().min(1, "Source must be defined"),
+        data_keys: z.array(
+          z.object({
+            key: z.string(),
+            target: z.enum([
+              "altitude",
+              "velocity",
+              "acceleration",
+              "pitch",
+              "yaw",
+              "roll",
+              "custom",
+            ]),
+          }),
+        ),
       }),
     )
     .mutation(({ input }) => {
       try {
         console.log("Setting telemetry source to:", input.source);
-        ServerEventListenerInstance.setSource(input.source);
+        const socket = ServerEventListenerInstance.addSource(input.source);
+        socket.socket.on("message", (msg) => {
+          const data = socket.decode(msg);
+          console.log("Received telemetry data:", data);
+          ee.emit("telemetry", data);
+        });
       } catch (e) {
         console.error("Failed to set telemetry source:", e);
         throw e;
@@ -137,4 +147,7 @@ export const realtimeRouter = createTRPCRouter({
 
       return;
     }),
+  getCurrentOverlayState: publicProcedure.query(() => {
+    // When the overlay first connects, send the current state
+  }),
 });

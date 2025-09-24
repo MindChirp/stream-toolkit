@@ -8,7 +8,7 @@ import TimerControls from "./_components/timer-controls";
 import TelemetrySource from "./_components/telemetry-source";
 
 const ControlCenter = () => {
-  const { mutate, isPending } = api.socket.setOverlayMode.useMutation();
+  const { mutate, isPending } = api.socket.setOverlayState.useMutation();
   const { data: overlayState } = api.socket.onOverlayState.useSubscription();
   return (
     <div className="flex w-full flex-col gap-5">
@@ -22,7 +22,7 @@ const ControlCenter = () => {
         <Group title="Overlay Mode">
           <div className="grid min-w-96 grid-cols-2 gap-2.5">
             <ControlButton
-              onClick={() => mutate({ mode: "early-countdown" })}
+              onClick={() => mutate({ state: "early-countdown" })}
               variant={
                 overlayState?.state === "early-countdown"
                   ? "default"
@@ -32,7 +32,7 @@ const ControlCenter = () => {
               Early countdown
             </ControlButton>
             <ControlButton
-              onClick={() => mutate({ mode: "final-countdown" })}
+              onClick={() => mutate({ state: "final-countdown" })}
               variant={
                 overlayState?.state === "final-countdown"
                   ? "default"
@@ -42,7 +42,7 @@ const ControlCenter = () => {
               Final countdown
             </ControlButton>
             <ControlButton
-              onClick={() => mutate({ mode: "in-flight" })}
+              onClick={() => mutate({ state: "in-flight" })}
               variant={
                 overlayState?.state === "in-flight" ? "default" : "secondary"
               }
@@ -50,7 +50,7 @@ const ControlCenter = () => {
               In-flight
             </ControlButton>
             <ControlButton
-              onClick={() => mutate({ mode: "post-flight" })}
+              onClick={() => mutate({ state: "post-flight" })}
               variant={
                 overlayState?.state === "post-flight" ? "default" : "secondary"
               }

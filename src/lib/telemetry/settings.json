@@ -1,0 +1,278 @@
+{
+  "ECU": {
+    "pressure": {
+      "id": "pressure",
+      "port": 9998,
+      "keys": [
+        "Ox tank",
+        "Fuel tank",
+        "N2 tank",
+        "After reg",
+        "Fuel injector",
+        "Ox injector",
+        "Chamber",
+        "Fuel inlet",
+        "timestamp"
+      ],
+      "fstring": "< 8f Q",
+      "aggregation_factor": 1
+    },
+    "temperature": {
+      "id": "temperature",
+      "port": 9999,
+      "keys": [
+        "Ox tank bot",
+        "Fuel tank",
+        "Fuel injector",
+        "Ox injector",
+        "TC5",
+        "Ox tank top",
+        "timestamp"
+      ],
+      "fstring": "< 6f Q",
+      "aggregation_factor": 1
+    },
+    "status": {
+      "id": "status",
+      "port": 9994,
+      "keys": [
+        "fsm_state",
+        "mov_pos",
+        "mov_en",
+        "prechill_pos",
+        "prechill_en",
+        "fu_fill_pos",
+        "fu_fill_en",
+        "ox_fill_pos",
+        "ox_fill_en",
+        "pressurize_pos",
+        "pressurize_en",
+        "mfv_pos",
+        "mfv_en",
+        "ox_vent",
+        "fu_vent",
+        "n2_fill",
+        "override",
+        "autovent_enabled",
+        "event",
+        "timestamp"
+      ],
+      "fstring": "< B H? H? H? H? H? H? 3? 2? H Q",
+      "aggregation_factor": 1
+    },
+    "reset": {
+      "id": "reset",
+      "port": 5001,
+      "keys": ["cause"],
+      "fstring": "s",
+      "aggregation_factor": 1
+    },
+    "can": {
+      "id": "can",
+      "port": 9993,
+      "keys": ["level", "capdac", "battery_voltage", "timestamp"],
+      "fstring": "< f B f Q",
+      "aggregation_factor": 1
+    }
+  },
+  "FC": {
+    "pressure": {
+      "id": "pressure",
+      "port": 6001,
+      "keys": [
+        "timestamp",
+        "pressure_unfiltered_0",
+        "pressure_unfiltered_1",
+        "pressure_unfiltered_2",
+        "pressure_unfiltered_3",
+        "pressure_unfiltered_4",
+        "pressure_filtered_0",
+        "pressure_filtered_1",
+        "pressure_filtered_2",
+        "pressure_filtered_3",
+        "pressure_filtered_4"
+      ],
+      "fstring": "< Q 10f",
+      "aggregation_factor": 1
+    },
+    "status": {
+      "id": "status",
+      "port": 6002,
+      "keys": [
+        "timestamp",
+        "fsm_state",
+        "event",
+        "servo_0_pos",
+        "servo_1_pos",
+        "servo_2_pos",
+        "servo_3_pos",
+        "servo_4_pos",
+        "servo_5_pos",
+        "servo_0_enable",
+        "servo_1_enable",
+        "servo_2_enable",
+        "servo_3_enable",
+        "servo_4_enable",
+        "servo_5_enable",
+        "solenoid_0_enable",
+        "cameras_on",
+        "hawk_tuah_on"
+      ],
+      "fstring": "< Q 2B 6H 9?",
+      "aggregation_factor": 1
+    },
+    "sensors": {
+      "id": "sensors",
+      "port": 6003,
+      "keys": [
+        "iim_accel_x",
+        "iim_accel_y",
+        "iim_accel_z",
+        "iim_gyro_x",
+        "iim_gyro_y",
+        "iim_gyro_z",
+        "icm_accel_x",
+        "icm_accel_y",
+        "icm_accel_z",
+        "icm_gyro_x",
+        "icm_gyro_y",
+        "icm_gyro_z",
+        "acc_high_x",
+        "acc_high_y",
+        "acc_high_z",
+        "ms5_pres",
+        "ms5_temp",
+        "ms5_alt",
+        "ms5_ex_pres",
+        "ms5_ex_temp",
+        "ms5_ex_altitude",
+        "bme_pres",
+        "bme_temp",
+        "bme_humid",
+        "bme_dewpoint",
+        "bme_altitude",
+        "bme_ex_pres",
+        "bme_ex_temp",
+        "bme_ex_humid",
+        "bme_ex_dewpoint",
+        "bme_ex_altitude",
+        "timestamp"
+      ],
+      "fstring": "< 32f Q",
+      "aggregation_factor": 1
+    },
+    "navigation": {
+      "id": "navigation",
+      "port": 6004,
+      "keys": [
+        "year",
+        "fixType",
+        "month",
+        "day",
+        "hour",
+        "min",
+        "sec",
+        "height",
+        "hacc",
+        "vacc",
+        "veln",
+        "vele",
+        "veld",
+        "neo_longitude",
+        "neo_latitude",
+        "gps_timestamp",
+        "vn_200_timestamp",
+        "week",
+        "status",
+        "yaw",
+        "pitch",
+        "roll",
+        "vn_latitude",
+        "vn_longtitude",
+        "vn_altitude",
+        "altitude_compensated",
+        "ned_vel_x",
+        "ned_vel_y",
+        "ned_vel_z",
+        "attUncertainty",
+        "posUncertainty",
+        "velUncertainty",
+        "timestamp"
+      ],
+      "fstring": "< H 6B 6f 3d d 2H 3f 4d 6f Q",
+      "aggregation_factor": 1
+    },
+    "kalman": {
+      "id": "kalman",
+      "port": 6005,
+      "keys": [
+        "kalman_altitude",
+        "kalman_velocity",
+        "alt",
+        "acc",
+        "kalman_yaw",
+        "kalman_pitch",
+        "kalman_roll",
+        "timestamp"
+      ],
+      "fstring": "< 7d Q",
+      "aggregation_factor": 1
+    },
+    "chargerinfo": {
+      "id": "chargerinfo",
+      "port": 6008,
+      "keys": [
+        "charger_status_1",
+        "charger_status_2",
+        "charger_status_3",
+        "fault_status",
+        "charger_flag_1",
+        "charger_flag_2",
+        "fault_flag",
+        "IAC",
+        "IBAT",
+        "VAC",
+        "VBAT",
+        "VSYS",
+        "TS"
+      ],
+      "fstring": "< 7B 6H 45x",
+      "aggregation_factor": 1
+    }
+  },
+  "Filling": {
+    "status": {
+      "id": "status",
+      "port": 7001,
+      "keys": [
+        "fsm_state",
+        "purge_pos",
+        "purge_en",
+        "ox_supply_pos",
+        "ox_supply_en",
+        "ox_bleed",
+        "n2_200",
+        "n2_300",
+        "override",
+        "event",
+        "timestamp"
+      ],
+      "fstring": "< B H? H? 4? H Q",
+      "aggregation_factor": 1
+    },
+    "sensor": {
+      "id": "sensor",
+      "port": 7002,
+      "keys": [
+        "Loadcell 1",
+        "Loadcell 2",
+        "Loadcell 3",
+        "Ox supply",
+        "N2 300 Bar",
+        "timestamp"
+      ],
+      "fstring": "<fffffQ",
+      "aggregation_factor": 40
+    }
+  }
+}

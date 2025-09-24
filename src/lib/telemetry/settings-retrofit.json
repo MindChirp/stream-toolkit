@@ -1,4 +1,7 @@
 {
+  "PC": {
+    "ip": "10.19.36.203"
+  },
   "FC": {
     "ip": "10.19.0.111",
     "data_streams": [
@@ -68,52 +71,10 @@
           "mcu_time",
           "kalman_altitude",
           "kalman_velocity",
-          "recovery_pressure"
+          "recovery_pressure",
+          "timestamp"
         ],
         "fstring": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-        "aggregation_factor": 1,
-        "append_ts": true,
-        "conversion_fn": null
-      },
-      {
-        "id": "FC_super_xbee",
-        "bidirectional": false,
-        "buffer_size": 500,
-        "local_port": "COM12",
-        "remote_port": 136,
-        "type": "XBEE",
-        "format": "raw",
-        "keys": [
-          "alignment",
-          "imu1_accel_x",
-          "imu1_accel_y",
-          "imu1_accel_z",
-          "imu1_gyro_x",
-          "imu1_gyro_y",
-          "imu1_gyro_z",
-          "imu2_accel_x",
-          "imu2_accel_y",
-          "imu2_accel_z",
-          "baro_pressure",
-          "baro_temperature",
-          "baro_altitude",
-          "longitude",
-          "latitude",
-          "height",
-          "hacc",
-          "vacc",
-          "veln",
-          "vele",
-          "veld",
-          "gps_timestamp",
-          "fsm_state",
-          "acc_z_moving_average",
-          "mcu_time",
-          "kalman_altitude",
-          "kalman_velocity",
-          "recovery_pressure"
-        ],
-        "fstring": "dddddddddddddddddddddddddddd",
         "aggregation_factor": 1,
         "append_ts": true,
         "conversion_fn": null
@@ -141,7 +102,8 @@
           "regulator",
           "ox_tank",
           "n2_tank",
-          "micros"
+          "micros",
+          "timestamp"
         ],
         "fstring": "HHHHHHHHI",
         "aggregation_factor": 50,
@@ -162,7 +124,8 @@
           "ox_injector",
           "fuel_tank",
           "ox_tank_top",
-          "micros"
+          "micros",
+          "timestamp"
         ],
         "fstring": "fffffQ",
         "aggregation_factor": 1,
@@ -213,38 +176,10 @@
           "fuelvent",
           "fuelvent_change_time",
           "oxvent",
-          "oxvent_change_time"
+          "oxvent_change_time",
+          "timestamp"
         ],
         "fstring": "BI???HI?IHI?IHI?IHI?IHI?IHI?I?I?I?I",
-        "aggregation_factor": 1,
-        "append_ts": true,
-        "conversion_fn": null
-      },
-      {
-        "id": "ECU_servo",
-        "bidirectional": false,
-        "buffer_size": 500,
-        "local_port": 9996,
-        "remote_port": 8888,
-        "type": "STIAN",
-        "format": "raw",
-        "keys": ["ox_pwm", "ox_ts"],
-        "keys_2": ["fuel_pwm", "fuel_ts"],
-        "fstring": "IIII",
-        "aggregation_factor": 40,
-        "append_ts": true,
-        "conversion_fn": null
-      },
-      {
-        "id": "ECU_string",
-        "bidirectional": false,
-        "buffer_size": 1,
-        "local_port": 9997,
-        "remote_port": 8888,
-        "type": "STR",
-        "format": "raw",
-        "keys": ["string"],
-        "fstring": "s",
         "aggregation_factor": 1,
         "append_ts": true,
         "conversion_fn": null
@@ -294,7 +229,8 @@
           "fuelvent",
           "fuelvent_change_time",
           "oxvent",
-          "oxvent_change_time"
+          "oxvent_change_time",
+          "timestamp"
         ],
         "fstring": "BI????HI?IHI?IHI?IHI?IHI?IHI?I?I?I?I",
         "aggregation_factor": 1,

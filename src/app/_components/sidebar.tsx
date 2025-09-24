@@ -1,5 +1,6 @@
 "use client";
 import { cn } from "@/utils/cn";
+import { SlidersHorizontal, Tv } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,19 +26,21 @@ const Sidebar = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
         />
       </div>
       <div className="flex w-full flex-col items-center lg:mt-20">
-        <SidebarButton to={"/admin"} active={pathname === "/"}>
+        {/* <SidebarButton to={"/admin"} active={pathname === "/"}>
           Hjem
-        </SidebarButton>
+        </SidebarButton> */}
         <SidebarButton to={"/overlay"} active={pathname === "/overlay"}>
+          <Tv size={16} />
           Overlay
         </SidebarButton>
         <SidebarButton
           to={"/admin/controlcenter"}
-          active={pathname === "/kontrollsenter"}
+          active={pathname === "/admin/controlcenter"}
         >
+          <SlidersHorizontal size={16} />
           Overlay controls
         </SidebarButton>
-        <SidebarButton
+        {/* <SidebarButton
           to={"/admin/controlcenter"}
           active={pathname === "/kontrollsenter"}
         >
@@ -48,7 +51,7 @@ const Sidebar = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
           active={pathname === "/kontrollsenter"}
         >
           Engine control
-        </SidebarButton>
+        </SidebarButton> */}
       </div>
     </div>
   );
@@ -69,7 +72,7 @@ const SidebarButton = ({
       <button
         className={cn(
           "hover:bg-tertiary/50 flex w-full cursor-pointer flex-row items-center justify-center gap-1 rounded-lg bg-transparent px-5 py-2.5 transition-colors",
-          { "font-bold": active },
+          active ? "bg-background text-accent-foreground font-bold" : undefined,
           className,
         )}
         {...props}

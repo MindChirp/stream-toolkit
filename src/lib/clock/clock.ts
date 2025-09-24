@@ -11,10 +11,21 @@ export class Clock {
     this.#time = this.#parseTimeString(time).timestamp;
   }
 
+  /**
+   * Gets the current clock state
+   */
   getState() {
     return this.#state;
   }
 
+  /**
+   * Parses the provided time string into an object containing a timestamp.
+   * The timespamp is measured in seconds, and is negative for numbers in T-,
+   * and positive for numbers in T+. A fitting metaphore is the AD/BC way of counting years.
+   *
+   * @param time Time in T-/+HHMMSS format
+   * @returns Object of time formats
+   */
   #parseTimeString(time: string) {
     if (!this.#checkTimeValidity(time)) throw new Error("Invalid time format");
     const sign = time[1] as "-" | "+";
@@ -32,19 +43,36 @@ export class Clock {
     };
   }
 
+  /**
+   * Checks if the provided time string is of T-/+HHMMSS format
+   * @param time
+   * @returns
+   */
   #checkTimeValidity(time: string) {
     const regex = /^T[+-](\d{6})$/;
     return regex.test(time);
   }
 
+  /**
+   * Sets the clock time
+   * @param time T-/+HHMMSS format
+   */
   setTime(time: string) {
     this.#time = this.#parseTimeString(time).timestamp;
   }
 
+  /**
+   * Sets the callback which should be called for each time tick (every 1 seconds)
+   * @param callback
+   */
   timeTickCallback(callback: (time: string) => void) {
     this.#callback = callback;
   }
 
+  /**
+   * Starts the clock
+   * @returns
+   */
   start() {
     if (this.#state === "active") return;
     this.#state = "active";
@@ -55,6 +83,9 @@ export class Clock {
     }, 1000);
   }
 
+  /**
+   * Stops the clock
+   */
   stop() {
     if (this.#state === "hold") return;
     this.#state = "hold";
@@ -63,12 +94,20 @@ export class Clock {
     this.#interval = null;
   }
 
+  /**
+   * Ticks the clock one step further. Essentially the same as counting one second.
+   * @returns
+   */
   #tick() {
     if (this.#state !== "active") return;
 
     this.#time += 1;
   }
 
+  /**
+   * Returns the time in T+/-HHMMSS format
+   * @returns
+   */
   getTime() {
     const time = Math.abs(this.#time);
     const sign = this.#time < 0 ? "-" : "+";
@@ -82,6 +121,11 @@ export class Clock {
     return `T${sign}${hours}${minutes}${seconds}`;
   }
 
+  /**
+   * Get the internal time representation timestamp used for counting time.
+   * @see parseTimeString
+   * @returns Raw timestamp in seconds
+   */
   getRawTime() {
     return this.#time;
   }

@@ -1,9 +1,8 @@
 "use client";
 
 import type { State } from "@/types/states";
-import NumberFlow from "@number-flow/react";
-import AnimatedNumbers from "react-animated-numbers";
 import { cn } from "@/utils/cn";
+import NumberFlow from "@number-flow/react";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
 import { PauseIcon } from "lucide-react";
@@ -13,10 +12,18 @@ import { type ComponentProps } from "react";
 import Gauge from "../gauge";
 import MapGauge from "../map-gauge";
 import Navball from "../navball";
-import { parseTime } from "./utils/parse-time";
 
 type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
+  timestamp?: string;
   overlayState: State;
+  altitude?: number;
+  speed?: number;
+  gForce?: number;
+  orientation?: {
+    pitch?: number;
+    yaw?: number;
+    roll?: number;
+  };
   clockState: {
     time: string;
     state: "hold" | "active";
@@ -28,6 +35,10 @@ const azeretMono = Azeret_Mono({
   subsets: ["latin"],
 });
 const BottomTelemetry = ({
+  speed = 0,
+  altitude = 0,
+  gForce = 1,
+  orientation,
   className,
   overlayState,
   clockState,
@@ -76,7 +87,11 @@ const BottomTelemetry = ({
                 className="flex w-full flex-row justify-end gap-10 pr-10"
               >
                 <SlideAnimation>
-                  <Navball />
+                  <Navball
+                    pitch={orientation?.pitch}
+                    yaw={orientation?.yaw}
+                    roll={orientation?.roll}
+                  />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 0.15 }}>
                   <MapGauge lat={63.786841} lng={9.363121} key="map" />
@@ -141,10 +156,17 @@ const BottomTelemetry = ({
                 className="flex w-full flex-row justify-start gap-10 pl-10"
               >
                 <SlideAnimation transition={{ delay: 0.3 }}>
-                  <Gauge label="speed" value={0} unit="km/h" />
+                  <Gauge label="speed" value={Math.round(speed)} unit="km/h" />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 0.45 }}>
-                  <Gauge label="altitude" value={0} unit="meters" />
+                  <Gauge
+                    label="altitude"
+                    value={Math.round(altitude)}
+                    unit="meters"
+                  />
+                </SlideAnimation>
+                <SlideAnimation transition={{ delay: 0.6 }}>
+                  <Gauge label="Accel" value={gForce.toFixed(1)} unit="G" />
                 </SlideAnimation>
               </motion.div>
             )}
