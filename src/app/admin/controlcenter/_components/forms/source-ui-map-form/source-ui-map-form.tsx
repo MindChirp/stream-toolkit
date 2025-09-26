@@ -32,7 +32,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import type z from "zod";
-import { UIMappingsRocketPresets } from "../../_components/constants/ui-mappings";
+import { UIMappingsRocketPresets } from "../../constants/ui-mappings";
 import { sourceUIMapFormSchema } from "./form-schema";
 
 type SourceUIMapFormProps = {
@@ -43,6 +43,9 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
   const [saving, setSaving] = useState(false);
   const sourceForm = useForm<z.infer<typeof sourceUIMapFormSchema>>({
     resolver: zodResolver(sourceUIMapFormSchema),
+    defaultValues: {
+      host: "",
+    },
   });
 
   const {
@@ -56,9 +59,13 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
 
   const handleSubmit = (data: z.infer<typeof sourceUIMapFormSchema>) => {
     setSaving(true);
-    void onSubmit(data).finally(() => {
-      setSaving(false);
-    });
+    void onSubmit(data)
+      .then(() => {
+        sourceForm.reset();
+      })
+      .finally(() => {
+        setSaving(false);
+      });
   };
 
   return (

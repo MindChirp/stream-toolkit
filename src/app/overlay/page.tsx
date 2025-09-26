@@ -29,6 +29,10 @@ const OverlayPage = () => {
             gForce={
               parseFloat((telemetry?.accelleration as string) ?? 0) / 9.81
             }
+            position={{
+              lat: telemetry?.lat as number,
+              lon: telemetry?.lon as number,
+            }}
             speed={telemetry?.velocity as number}
             altitude={telemetry?.altitude as number}
             orientation={{

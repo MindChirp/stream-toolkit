@@ -1,15 +1,24 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { UiMap } from "@/lib/telemetry/telemetry-client-retrofit";
 import { cn } from "@/lib/utils";
+import { TRPCError } from "@trpc/server";
 import { Loader, Trash } from "lucide-react";
 import { useState, type ComponentProps } from "react";
+import { toast } from "sonner";
 
 type TelemetryRowProps = {
   name: string;
   mappings: UiMap[];
   onDelete: () => Promise<unknown>;
-} & ComponentProps<"div">;
+} & ComponentProps<typeof Card>;
 
 const TelemetryRow = ({
   name,
@@ -19,32 +28,24 @@ const TelemetryRow = ({
   ...props
 }: TelemetryRowProps) => {
   const [deleting, setDeleting] = useState(false);
+  const handleDelete = () => {
+    setDeleting(true);
+    void onDelete().finally(() => setDeleting(false));
+  };
   return (
-    <div
-      className={cn(
-        "bg-secondary flex flex-row gap-5 rounded-lg px-5 py-2.5",
-        className,
-      )}
-      {...props}
-    >
-      <Badge variant="outline">{name}</Badge>
-      <Badge variant={"outline"}>{mappings.length} data sources</Badge>
-      <Button
-        type="button"
-        variant="ghost"
-        className="cursor-pointer"
-        onClick={(e) => {
-          e.preventDefault();
-          setDeleting(true);
-          void onDelete().finally(() => {
-            setDeleting(false);
-          });
-        }}
-      >
-        {deleting && <Loader className="animate-spin" />}
-        {!deleting && <Trash />}
-      </Button>
-    </div>
+    <Card className={cn("w-full", className)} {...props}>
+      <CardHeader>
+        <CardTitle>{name}</CardTitle>
+        <CardDescription>{mappings.length} mappings</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <CardAction>
+          <Button onClick={handleDelete}>
+            {deleting ? <Loader className="animate-spin" /> : <Trash />}
+          </Button>
+        </CardAction>
+      </CardContent>
+    </Card>
   );
 };
 

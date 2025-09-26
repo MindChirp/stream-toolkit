@@ -4,10 +4,11 @@ import { api } from "@/trpc/react";
 import { Loader } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import type z from "zod";
-import type { sourceUIMapFormSchema } from "../forms/source-ui-map-form/form-schema";
-import SourceUIMapForm from "../forms/source-ui-map-form/source-ui-map-form";
+import type { sourceUIMapFormSchema } from "./forms/source-ui-map-form/form-schema";
+import SourceUIMapForm from "./forms/source-ui-map-form/source-ui-map-form";
 import TelemetryRow from "./telemetry-row";
 import { toast } from "sonner";
+import type { TRPCError } from "@trpc/server";
 
 const TelemetrySource = () => {
   const { mutateAsync } = api.socket.setupTelemetrySource.useMutation();
@@ -23,8 +24,8 @@ const TelemetrySource = () => {
       .then(() => {
         void utils.socket.invalidate();
       })
-      .catch(() => {
-        toast.error("Could not set up telemetry source");
+      .catch((e: TRPCError) => {
+        toast.error("Could not set up telemetry source: " + e.message);
       });
   };
   return (
@@ -33,12 +34,13 @@ const TelemetrySource = () => {
       <AnimatePresence>
         {!!sources?.length && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
+            initial={{ height: 0, opacity: 0, overflow: "hidden" }}
             animate={{
               height: "auto",
+              overflow: "initial",
               opacity: 1,
             }}
-            exit={{ height: 0, opacity: 0 }}
+            exit={{ height: 0, opacity: 0, overflow: "hidden" }}
           >
             <h2 className="mt-5">Sources</h2>
             <Separator className="mb-2.5" />
@@ -49,9 +51,9 @@ const TelemetrySource = () => {
                     return deleteSource({
                       host: s.host,
                       port: s.port,
-                    }).then(() => {
-                      void utils.socket.getTelemetrySources.invalidate();
-                    });
+                    })
+                      .then(() => utils.socket.getTelemetrySources.invalidate())
+                      .catch((e: TRPCError) => toast.error(e.message));
                   }}
                   name={s.host + ":" + s.port}
                   mappings={s.mappings}

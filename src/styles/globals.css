@@ -125,3 +125,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* This removes all the unneeded GUI elements from the react google map component */
+a[href^="http://maps.google.com/maps"]
+{
+  display: none !important;
+}
+a[href^="https://maps.google.com/maps"]
+{
+  display: none !important;
+}
+
+.gmnoprint a,
+.gmnoprint span,
+.gm-style-cc {
+  display: none;
+}
+.gmnoprint div {
+  background: none !important;
+}

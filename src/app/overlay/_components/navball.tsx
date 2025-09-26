@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Instance, Instances, OrbitControls } from "@react-three/drei";
 import {
   Canvas,
@@ -5,7 +6,7 @@ import {
   useLoader,
   type ThreeElements,
 } from "@react-three/fiber";
-import { Suspense, useMemo, useRef } from "react";
+import { ComponentProps, Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { STLLoader } from "three-stdlib";
 
@@ -116,10 +117,16 @@ type NavballProps = {
   pitch?: number;
   yaw?: number;
   roll?: number;
-};
-const Navball = ({ pitch, yaw, roll }: NavballProps) => {
+} & ComponentProps<"div">;
+const Navball = ({ pitch, yaw, roll, className, ...props }: NavballProps) => {
   return (
-    <div className="relative h-[9.5rem] w-[9.5rem] overflow-hidden rounded-full bg-black/50">
+    <div
+      className={cn(
+        "relative h-[9.5rem] w-[9.5rem] overflow-hidden rounded-full bg-black/50",
+        className,
+      )}
+      {...props}
+    >
       <div className="absolute top-0 left-0 h-full w-full rounded-full border border-[#aaaaaa] bg-gradient-to-b from-black to-transparent" />
 
       <Canvas

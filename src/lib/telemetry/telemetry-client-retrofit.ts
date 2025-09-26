@@ -5,6 +5,7 @@ import ip from "ip";
 import struct from "python-struct";
 import SettingJSON from "./settings-retrofit.json";
 import type { UI_DATASOURCE_TARGETS } from "./constants/ui-targets";
+import { TRPCError } from "@trpc/server";
 
 export type UiMap = {
   from: string;
@@ -79,7 +80,7 @@ export class ServerEventHandlerRetrofit {
   addSource(host: string, port: number, uiSourceMap: UiMap[]) {
     // Check if a socket for this port already exists
     const existingSocket = this.#sockets?.find(
-      (s) => s.socket.address().port === port,
+      (s) => s.port === port && s.host === host,
     );
 
     // Fail silently (just return the existing port)
@@ -88,23 +89,54 @@ export class ServerEventHandlerRetrofit {
     // Check IP protocol (IPv4 vs IPv6)
 
     const validProtocol = ip.isV4Format(host) ?? ip.isV6Format(host);
-    if (!validProtocol) throw new Error("Invalid IP address format");
+    if (!validProtocol)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Invalid IP address format",
+      });
 
     // Create a UDP IPv4 socket
     const newSocket = dgram.createSocket(ip.isV4Format(host) ? "udp4" : "udp6");
 
-    newSocket.bind(port, host);
+    console.log("HERE!");
+    try {
+      console.log("HERE 1");
+      newSocket.bind(port, host);
+      console.log("HERE 2");
+    } catch {
+      // Remove socket from the list
+      console.log("FUCK");
+      this.#sockets = this.#sockets.filter(
+        (s) => !(s.host === host && s.port === port),
+      );
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Could not open socket to telemetry source",
+      });
+    }
 
+    console.log("HERE 3");
     // Push socket to list
     const portSettings = this.#getSettingsByPort(port);
-    if (!portSettings) throw new Error("No settings found for port " + port);
+    if (!portSettings)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        cause: "Invalid port",
+        message: "No settings found for port " + port,
+      });
+
+    console.log("HERE 4");
     const telemetrySocket = new TelemetrySocket(
       portSettings.fstring,
       newSocket,
       portSettings.keys,
       uiSourceMap,
+      host,
+      port,
     );
     this.#sockets.push(telemetrySocket);
+
+    console.log("HERE 5");
 
     // Remove the socket if it closes.
     newSocket.on("close", () => {
@@ -116,10 +148,13 @@ export class ServerEventHandlerRetrofit {
 
   removeSource(host: string, port: number) {
     const socket = this.#sockets.find(
-      (p) =>
-        p.socket.address().address === host && p.socket.address().port === port,
+      (p) => p.host === host && p.port === port,
     );
-    if (!socket) throw new Error("The socket does not exist");
+    if (!socket)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "The socket does not exist",
+      });
 
     try {
       socket.socket.disconnect();
@@ -129,11 +164,7 @@ export class ServerEventHandlerRetrofit {
 
     // Remove the socket from the sockets list
     this.#sockets = this.#sockets.filter(
-      (s) =>
-        !(
-          s.socket.address().address === host &&
-          s.socket.address().port === port
-        ),
+      (s) => !(s.host === host && s.port === port),
     );
   }
 
@@ -143,11 +174,7 @@ export class ServerEventHandlerRetrofit {
 
   #getSettingsByPort(port: number) {
     // Extract all data_streams objects from all devices
-    console.log(
-      Object.values(settings)
-        .flatMap((device) => device.data_streams)
-        .find((stream) => stream?.local_port === port),
-    );
+
     return Object.values(settings)
       .flatMap((device) => device.data_streams)
       .find((stream) => stream?.local_port === port);
@@ -170,10 +197,13 @@ export class TelemetrySocket {
   readonly fstring: string;
   readonly labels: string[];
   readonly uiDataMap: UiMap[];
+  readonly host: string;
+  readonly port: number;
 
   constructor(
     fstring: string,
     socket: dgram.Socket,
+
     labels: string[],
     uiTargets: {
       /**
@@ -186,11 +216,15 @@ export class TelemetrySocket {
        */
       uiTarget: (typeof UI_DATASOURCE_TARGETS)[number];
     }[],
+    host: string,
+    port: number,
   ) {
     this.fstring = fstring;
     this.socket = socket;
     this.labels = labels;
     this.uiDataMap = uiTargets;
+    this.host = host;
+    this.port = port;
   }
 
   decode(buff: Buffer<ArrayBufferLike>) {

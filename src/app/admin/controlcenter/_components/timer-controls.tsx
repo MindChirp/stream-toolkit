@@ -96,11 +96,7 @@ const TimerControls = () => {
                 <FormItem className="flex flex-col items-center">
                   <FormControl>
                     <div className="flex flex-col gap-2.5 md:flex-row">
-                      <InputOTP
-                        maxLength={6}
-                        defaultValue={"003000"}
-                        {...field}
-                      >
+                      <InputOTP maxLength={6} {...field}>
                         <InputOTPGroup>
                           <InputOTPSlot index={0} />
                           <InputOTPSlot index={1} />

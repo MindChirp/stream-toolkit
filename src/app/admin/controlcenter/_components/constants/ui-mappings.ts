@@ -1,5 +1,5 @@
 import type z from "zod";
-import type { sourceUIMapFormSchema } from "../../forms/source-ui-map-form/form-schema";
+import type { sourceUIMapFormSchema } from "../forms/source-ui-map-form/form-schema";
 
 export const UIMappingsRocketPresets: Record<
   string,

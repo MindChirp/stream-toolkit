@@ -197,6 +197,7 @@ export const realtimeRouterRevamped = createTRPCRouter({
     )
     .mutation(({ input }) => {
       // Create a telemetry source
+
       const socket = ServerListener.addSource(
         input.host,
         input.port,
@@ -208,7 +209,7 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
       socket.socket.on("message", (msg) => {
         const data = socket.decode(msg);
-        console.log("Received telemetry data:", data);
+        // console.log("Received telemetry data:", data);
         ee.emit("telemetry", data);
       });
 

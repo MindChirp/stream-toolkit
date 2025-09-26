@@ -6,12 +6,13 @@ import NumberFlow from "@number-flow/react";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
 import { PauseIcon } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, NumberMap } from "motion/react";
 import { Azeret_Mono } from "next/font/google";
 import { type ComponentProps } from "react";
 import Gauge from "../gauge";
 import MapGauge from "../map-gauge";
 import Navball from "../navball";
+import SystemStates from "../system-states";
 
 type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
   timestamp?: string;
@@ -19,6 +20,10 @@ type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
   altitude?: number;
   speed?: number;
   gForce?: number;
+  position?: {
+    lat?: number;
+    lon?: number;
+  };
   orientation?: {
     pitch?: number;
     yaw?: number;
@@ -42,6 +47,7 @@ const BottomTelemetry = ({
   className,
   overlayState,
   clockState,
+  position,
   ...props
 }: BottomTelemetryProps) => {
   return (
@@ -87,6 +93,9 @@ const BottomTelemetry = ({
                 className="flex w-full flex-row justify-end gap-10 pr-10"
               >
                 <SlideAnimation>
+                  <SystemStates ECU FC />
+                </SlideAnimation>
+                <SlideAnimation>
                   <Navball
                     pitch={orientation?.pitch}
                     yaw={orientation?.yaw}
@@ -94,7 +103,12 @@ const BottomTelemetry = ({
                   />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 0.15 }}>
-                  <MapGauge lat={63.786841} lng={9.363121} key="map" />
+                  <MapGauge
+                    lat={position?.lat ?? 0}
+                    lng={position?.lon ?? 0}
+                    key="map"
+                    zoomOverride={altitude > 20 ? 15 : undefined}
+                  />
                 </SlideAnimation>
               </motion.div>
             )}
