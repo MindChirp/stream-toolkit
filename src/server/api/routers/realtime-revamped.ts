@@ -214,4 +214,12 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
       return;
     }),
+
+  deleteTelemetrySource: publicProcedure
+    .input(z.object({ host: z.string(), port: z.number() }))
+    .mutation(({ input }) => {
+      ServerListener.removeSource(input.host, input.port);
+
+      return;
+    }),
 });

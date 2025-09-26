@@ -111,6 +111,8 @@ const TelemetrySource = () => {
     api.socket.setupTelemetrySource.useMutation();
   const { data: sources, status: sourcesStatus } =
     api.socket.getTelemetrySources.useQuery();
+  const { mutateAsync: deleteSource, status: deleteSourceStatus } =
+    api.socket.deleteTelemetrySource.useMutation();
   const utils = api.useUtils();
 
   const sourceForm = useForm<z.infer<typeof sourceFormSchema>>({
@@ -324,18 +326,36 @@ const TelemetrySource = () => {
         </form>
       </Form>
 
-      <h2 className="mt-5">Sources</h2>
-      <Separator className="mb-2.5" />
-      <div className="flex flex-row gap-2.5">
-        {sources?.map((s) => (
-          <TelemetryRow
-            name={s.host + ":" + s.port}
-            mappings={s.mappings}
-            key={s.host + s.port}
-          />
-        ))}
-        {sourcesStatus === "pending" && <Loader className="animate-spin" />}
-      </div>
+      {!!sources?.length && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{
+            height: "auto",
+            opacity: 1,
+          }}
+        >
+          <h2 className="mt-5">Sources</h2>
+          <Separator className="mb-2.5" />
+          <div className="flex flex-row gap-2.5">
+            {sources?.map((s) => (
+              <TelemetryRow
+                onDelete={() => {
+                  return deleteSource({
+                    host: s.host,
+                    port: s.port,
+                  }).then(() => {
+                    void utils.socket.getTelemetrySources.invalidate();
+                  });
+                }}
+                name={s.host + ":" + s.port}
+                mappings={s.mappings}
+                key={s.host + s.port + Math.random()}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
+      {sourcesStatus === "pending" && <Loader className="animate-spin" />}
     </div>
   );
 };

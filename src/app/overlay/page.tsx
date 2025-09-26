@@ -9,8 +9,8 @@ import { useTelemetry } from "@/lib/hooks/useTelemetry";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
-  const { data: state } = api.socket.onOverlayState.useSubscription();
   const telemetry = useTelemetry();
+  const { data: state } = api.socket.onOverlayState.useSubscription();
   const { data: time } = api.socket.onClock.useSubscription();
 
   return (

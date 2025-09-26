@@ -3,19 +3,22 @@ import { Button } from "@/components/ui/button";
 import type { UiMap } from "@/lib/telemetry/telemetry-client-retrofit";
 import { cn } from "@/lib/utils";
 import { Delete, Trash } from "lucide-react";
-import React, { type ComponentProps } from "react";
+import React, { useState, type ComponentProps } from "react";
 
 type TelemetryRowProps = {
   name: string;
   mappings: UiMap[];
+  onDelete: () => Promise<unknown>;
 } & ComponentProps<"div">;
 
 const TelemetryRow = ({
   name,
   mappings,
   className,
+  onDelete,
   ...props
 }: TelemetryRowProps) => {
+  const [deleting, setDeleting] = useState(false);
   return (
     <div
       className={cn(
@@ -26,7 +29,16 @@ const TelemetryRow = ({
     >
       <Badge variant="outline">{name}</Badge>
       <Badge variant={"outline"}>{mappings.length} data sources</Badge>
-      <Button variant="ghost" className="cursor-pointer">
+      <Button
+        variant="ghost"
+        className="cursor-pointer"
+        onClick={() => {
+          setDeleting(true);
+          void onDelete().finally(() => {
+            setDeleting(false);
+          });
+        }}
+      >
         <Trash />
       </Button>
     </div>

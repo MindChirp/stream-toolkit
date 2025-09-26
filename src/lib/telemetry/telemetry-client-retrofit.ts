@@ -114,6 +114,29 @@ export class ServerEventHandlerRetrofit {
     return telemetrySocket;
   }
 
+  removeSource(host: string, port: number) {
+    const socket = this.#sockets.find(
+      (p) =>
+        p.socket.address().address === host && p.socket.address().port === port,
+    );
+    if (!socket) throw new Error("The socket does not exist");
+
+    try {
+      socket.socket.disconnect();
+    } catch (e) {
+      console.error("Could not disconnect socket: ", e);
+    }
+
+    // Remove the socket from the sockets list
+    this.#sockets = this.#sockets.filter(
+      (s) =>
+        !(
+          s.socket.address().address === host &&
+          s.socket.address().port === port
+        ),
+    );
+  }
+
   getSources() {
     return this.#sockets;
   }
