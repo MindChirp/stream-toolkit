@@ -2,8 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { UiMap } from "@/lib/telemetry/telemetry-client-retrofit";
 import { cn } from "@/lib/utils";
-import { Delete, Trash } from "lucide-react";
-import React, { useState, type ComponentProps } from "react";
+import { Loader, Trash } from "lucide-react";
+import { useState, type ComponentProps } from "react";
 
 type TelemetryRowProps = {
   name: string;
@@ -30,16 +30,19 @@ const TelemetryRow = ({
       <Badge variant="outline">{name}</Badge>
       <Badge variant={"outline"}>{mappings.length} data sources</Badge>
       <Button
+        type="button"
         variant="ghost"
         className="cursor-pointer"
-        onClick={() => {
+        onClick={(e) => {
+          e.preventDefault();
           setDeleting(true);
           void onDelete().finally(() => {
             setDeleting(false);
           });
         }}
       >
-        <Trash />
+        {deleting && <Loader className="animate-spin" />}
+        {!deleting && <Trash />}
       </Button>
     </div>
   );

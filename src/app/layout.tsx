@@ -5,6 +5,7 @@ import { Poppins } from "next/font/google";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { HydrateClient } from "@/trpc/server";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -25,7 +26,10 @@ export default function RootLayout({
     <html lang="en" className={`${poppins.className}`}>
       <body className="">
         <TRPCReactProvider>
-          <HydrateClient>{children}</HydrateClient>
+          <HydrateClient>
+            <Toaster />
+            {children}
+          </HydrateClient>
         </TRPCReactProvider>
       </body>
     </html>

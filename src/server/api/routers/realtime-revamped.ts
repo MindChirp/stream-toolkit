@@ -71,10 +71,10 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
   onClock: publicProcedure.subscription(async function* (opts) {
     // Yield an initial clock state
-    // yield {
-    //   time: OverlayInstance.clock.getTime(),
-    //   state: OverlayInstance.clock.getState(),
-    // } as ClockStateData;
+    yield {
+      time: OverlayInstance.clock.getTime(),
+      state: OverlayInstance.clock.getState(),
+    } as ClockStateData;
 
     for await (const [data] of on(ee, OUTGOING_DATA_CHANNELS.CLOCK_STATE, {
       signal: opts.signal,
