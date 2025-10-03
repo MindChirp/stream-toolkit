@@ -5,6 +5,7 @@ import OverlayComponentsControls from "./_components/overlay-components-controls
 import OverlayStateControls from "./_components/overlay-state-controls";
 import TelemetrySource from "./_components/telemetry-source";
 import TimerControls from "./_components/timer-controls";
+import CheckStates from "./_components/check-states";
 
 const ControlCenter = () => {
   return (
@@ -16,6 +17,7 @@ const ControlCenter = () => {
         <Group title="Timer Controls">
           <TimerControls />
         </Group>
+        <CheckStates />
         <Group title="Telemetry Setup">
           <TelemetrySource />
         </Group>

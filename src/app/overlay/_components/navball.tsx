@@ -6,7 +6,7 @@ import {
   useLoader,
   type ThreeElements,
 } from "@react-three/fiber";
-import { ComponentProps, Suspense, useMemo, useRef } from "react";
+import { Suspense, useMemo, useRef, type ComponentProps } from "react";
 import * as THREE from "three";
 import { STLLoader } from "three-stdlib";
 

@@ -6,7 +6,7 @@ import NumberFlow from "@number-flow/react";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
 import { PauseIcon } from "lucide-react";
-import { AnimatePresence, motion, NumberMap } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Azeret_Mono } from "next/font/google";
 import { type ComponentProps } from "react";
 import Gauge from "../gauge";
@@ -92,17 +92,25 @@ const BottomTelemetry = ({
                 key="left-telemetry"
                 className="flex w-full flex-row justify-end gap-10 pr-10"
               >
-                <SlideAnimation>
+                <SlideAnimation
+                  transition={{
+                    delay: 2,
+                  }}
+                >
                   <SystemStates ECU FC />
                 </SlideAnimation>
-                <SlideAnimation>
+                <SlideAnimation
+                  transition={{
+                    delay: 2.15,
+                  }}
+                >
                   <Navball
                     pitch={orientation?.pitch}
                     yaw={orientation?.yaw}
                     roll={orientation?.roll}
                   />
                 </SlideAnimation>
-                <SlideAnimation transition={{ delay: 0.15 }}>
+                <SlideAnimation transition={{ delay: 2.3 }}>
                   <MapGauge
                     lat={position?.lat ?? 0}
                     lng={position?.lon ?? 0}
@@ -169,17 +177,17 @@ const BottomTelemetry = ({
                 key="right-telemetry"
                 className="flex w-full flex-row justify-start gap-10 pl-10"
               >
-                <SlideAnimation transition={{ delay: 0.3 }}>
+                <SlideAnimation transition={{ delay: 2.45 }}>
                   <Gauge label="speed" value={Math.round(speed)} unit="km/h" />
                 </SlideAnimation>
-                <SlideAnimation transition={{ delay: 0.45 }}>
+                <SlideAnimation transition={{ delay: 2.6 }}>
                   <Gauge
                     label="altitude"
                     value={Math.round(altitude)}
                     unit="meters"
                   />
                 </SlideAnimation>
-                <SlideAnimation transition={{ delay: 0.6 }}>
+                <SlideAnimation transition={{ delay: 2.75 }}>
                   <Gauge label="Accel" value={gForce.toFixed(1)} unit="G" />
                 </SlideAnimation>
               </motion.div>
