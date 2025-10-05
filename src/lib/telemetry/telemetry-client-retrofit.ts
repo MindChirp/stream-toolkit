@@ -105,7 +105,6 @@ export class ServerEventHandlerRetrofit {
       console.log("HERE 2");
     } catch {
       // Remove socket from the list
-      console.log("FUCK");
       this.#sockets = this.#sockets.filter(
         (s) => !(s.host === host && s.port === port),
       );

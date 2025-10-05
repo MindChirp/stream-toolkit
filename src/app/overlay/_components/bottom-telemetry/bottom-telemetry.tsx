@@ -1,18 +1,19 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import type { State } from "@/types/states";
 import { cn } from "@/utils/cn";
 import NumberFlow from "@number-flow/react";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
-import { PauseIcon } from "lucide-react";
+import { Info, PauseIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Azeret_Mono } from "next/font/google";
+import Image from "next/image";
 import { type ComponentProps } from "react";
 import Gauge from "../gauge";
 import MapGauge from "../map-gauge";
 import Navball from "../navball";
-import SystemStates from "../system-states";
 
 type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
   timestamp?: string;
@@ -33,6 +34,10 @@ type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
     time: string;
     state: "hold" | "active";
   };
+  message?: {
+    show: boolean;
+    message?: string | null;
+  };
 };
 
 const azeretMono = Azeret_Mono({
@@ -47,6 +52,7 @@ const BottomTelemetry = ({
   className,
   overlayState,
   clockState,
+  message,
   position,
   ...props
 }: BottomTelemetryProps) => {
@@ -96,8 +102,16 @@ const BottomTelemetry = ({
                   transition={{
                     delay: 2,
                   }}
+                  className="flex items-center"
                 >
-                  <SystemStates ECU FC />
+                  <Image
+                    src="/images/logo-white.png"
+                    width={1000}
+                    height={1000}
+                    alt="Logo"
+                    className="h-fit w-52"
+                  />
+                  {/* <SystemStates ECU FC /> */}
                 </SlideAnimation>
                 <SlideAnimation
                   transition={{
@@ -148,23 +162,57 @@ const BottomTelemetry = ({
             )}
           </AnimatePresence>
 
-          <Header
-            key="countdown"
-            className={cn(
-              `${azeretMono.className} relative w-fit font-normal tracking-tighter whitespace-nowrap text-white`,
-            )}
-          >
-            {/* {clockState.time} */}
-            {clockState.time.slice(0, 2)}
-            <NumberFlow value={parseInt(clockState.time.slice(2, 3))} />
-            <NumberFlow value={parseInt(clockState.time.slice(3, 4))} />
-            :
-            <NumberFlow value={parseInt(clockState.time.slice(4, 5))} />
-            <NumberFlow value={parseInt(clockState.time.slice(5, 6))} />
-            :
-            <NumberFlow value={parseInt(clockState.time.slice(6, 7))} />
-            <NumberFlow value={parseInt(clockState.time.slice(7, 8))} />
-          </Header>
+          <div className="flex flex-col">
+            <AnimatePresence>
+              {message?.show && (
+                <motion.div
+                  key="message-box"
+                  initial={{
+                    y: 10,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    y: 0,
+                    opacity: 1,
+                  }}
+                  exit={{
+                    y: 10,
+                    opacity: 0,
+                  }}
+                  className="absolute -top-0 left-0 flex w-full -translate-y-full flex-row items-center gap-5 rounded-lg bg-white px-5 py-2.5"
+                >
+                  <Info size={18} />
+                  {message.message}
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <Header
+              key="countdown"
+              className={cn(
+                `${azeretMono.className} relative w-fit font-normal tracking-tighter whitespace-nowrap text-white`,
+              )}
+            >
+              {/* {clockState.time} */}
+              {clockState.time.slice(0, 2)}
+              <NumberFlow value={parseInt(clockState.time.slice(2, 3))} />
+              <NumberFlow value={parseInt(clockState.time.slice(3, 4))} />
+              :
+              <NumberFlow value={parseInt(clockState.time.slice(4, 5))} />
+              <NumberFlow value={parseInt(clockState.time.slice(5, 6))} />
+              :
+              <NumberFlow value={parseInt(clockState.time.slice(6, 7))} />
+              <NumberFlow value={parseInt(clockState.time.slice(7, 8))} />
+            </Header>
+            <div className="absolute bottom-0 grid w-full translate-y-full grid-cols-[min-content_auto_min-content] items-center justify-center gap-2.5 text-center whitespace-nowrap text-white">
+              <span className="w-full text-end whitespace-nowrap">
+                Pre Ox Fill
+              </span>
+              <Badge variant={"secondary"} className="rounded-full">
+                <span className="text-2xl font-bold">Ignition</span>
+              </Badge>
+              <span className="w-full max-w-full text-start">Post Ox Fill</span>
+            </div>
+          </div>
         </div>
         <div
           key="right-telemetry-wrapper"

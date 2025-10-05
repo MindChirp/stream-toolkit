@@ -7,6 +7,7 @@ type MapGaugeProps = {
   lat: number;
   lng: number;
   zoomOverride?: number;
+  inert?: boolean;
 };
 
 const ZoomSteps = [13, 5, 3];
@@ -19,7 +20,7 @@ const getNextZoomLevel = (current: number) => {
   return ZoomSteps[currentIndex + 1];
 };
 
-const MapGauge = ({ zoomOverride, lat, lng }: MapGaugeProps) => {
+const MapGauge = ({ inert = false, zoomOverride, lat, lng }: MapGaugeProps) => {
   const [zoom, setZoom] = useState(zoomOverride ?? 13);
 
   useEffect(() => {
@@ -28,6 +29,7 @@ const MapGauge = ({ zoomOverride, lat, lng }: MapGaugeProps) => {
   }, [zoomOverride]);
 
   useEffect(() => {
+    if (inert) return;
     const interval = setInterval(() => {
       setZoom((prev) => {
         if (zoomOverride) return zoomOverride;
@@ -38,7 +40,7 @@ const MapGauge = ({ zoomOverride, lat, lng }: MapGaugeProps) => {
     return () => {
       clearInterval(interval);
     };
-  }, [zoomOverride]);
+  }, [zoomOverride, inert]);
   return (
     <div className="flex h-[9.5rem] w-[9.5rem] items-center justify-center overflow-hidden rounded-full bg-black/50">
       {/* <Image
@@ -51,7 +53,6 @@ const MapGauge = ({ zoomOverride, lat, lng }: MapGaugeProps) => {
       <GoogleMapReact
         draggable={false}
         options={{
-          mapTypeId: "hybrid",
           fullscreenControl: false,
           disableDefaultUI: true,
           zoomControl: false,

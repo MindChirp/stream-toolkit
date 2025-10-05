@@ -1,4 +1,5 @@
 "use client";
+
 import Group from "@/app/_components/group";
 import Header from "components/header";
 import OverlayComponentsControls from "./_components/overlay-components-controls";
@@ -6,21 +7,27 @@ import OverlayStateControls from "./_components/overlay-state-controls";
 import TelemetrySource from "./_components/telemetry-source";
 import TimerControls from "./_components/timer-controls";
 import CheckStates from "./_components/check-states";
+import { api } from "@/trpc/react";
+import MessageControls from "./_components/message-controls";
 
 const ControlCenter = () => {
+  const { data: states } = api.socket.onOverlayState.useSubscription();
+  // const states = undefined;
+
   return (
     <div className="flex w-full flex-col gap-5">
       <Header>Control Center</Header>
       <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-2">
-        <OverlayStateControls />
+        <OverlayStateControls state={states?.state} />
         <OverlayComponentsControls />
         <Group title="Timer Controls">
           <TimerControls />
         </Group>
-        <CheckStates />
+        <CheckStates goNoGoPolls={states?.goNoGoPolls} />
         <Group title="Telemetry Setup">
           <TelemetrySource />
         </Group>
+        <MessageControls />
         {/* <Group
           title="Danger Area"
           variant="danger"

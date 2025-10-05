@@ -6,15 +6,22 @@ import { AnimatePresence } from "motion/react";
 import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
 import SmallCountdown from "./_components/small-countdown";
 import StateTimeline from "./_components/state-timeline";
+import GoNoGoPolls from "./_components/go-nogo-polls";
+import ComputerStates from "./_components/computer-states";
+import SponsorReel from "./_components/sponsor-reel";
+import Image from "next/image";
+import { motion } from "motion/react";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
+  // Something wrong in this file
   const telemetry = useTelemetry();
+  // const state = {};
   const { data: state } = api.socket.onOverlayState.useSubscription();
   const { data: time } = api.socket.onClock.useSubscription();
 
   return (
-    <div className="flex h-screen max-h-screen w-full overflow-hidden">
+    <div className="relative flex h-screen max-h-screen w-full overflow-hidden">
       <AnimatePresence>
         {state?.state && state?.state !== "post-flight" && (
           <StateTimeline key="state-timeline" state={state.state} />
@@ -23,18 +30,64 @@ const OverlayPage = () => {
           state?.state === "final-countdown") && (
           <SponsorReel key="sponsor-reel" className="absolute top-52 right-0" />
         )} */}
+        {/* <h1 className="absolute top-1/2 left-1/2 text-black">
+          {JSON.stringify(time)}
+        </h1> */}
 
         {state?.state === "early-countdown" && (
           <SmallCountdown
+            className="top-[19rem]"
+            key="small-countdown"
             time={time?.time.slice(2, 8) ?? "TBD"}
             preLaunch={time?.time.slice(0, 2) === "T-" ? true : false}
           />
         )}
 
+        {state?.goNoGoPolls?.show && (
+          <GoNoGoPolls state={state.goNoGoPolls.states} key="go-no-go-polls" />
+        )}
+
+        <ComputerStates key="computer-states" className="top-[24rem]" />
+
+        {/* <ComputerStates
+          key="computer-states"
+          className="top-[24rem] right-full left-0"
+        /> */}
+
+        {state?.state == "early-countdown" && (
+          <motion.div
+            className="absolute top-[8rem] right-5 z-20 h-32 w-fit"
+            key="propulse-logo"
+            initial={{
+              x: "100%",
+            }}
+            animate={{
+              x: 0,
+            }}
+            exit={{
+              x: "100%",
+              transition: {
+                duration: 0.5,
+                delay: 0.5,
+                ease: "easeIn",
+              },
+            }}
+            transition={{ duration: 1, ease: "circOut", delay: 0.5 }}
+          >
+            <Image
+              src="/images/logo-white.png"
+              width={1000}
+              height={1000}
+              className="h-full w-full object-cover"
+              alt="Mor di"
+            />
+          </motion.div>
+        )}
         {state?.state &&
           state?.state !== "post-flight" &&
           state?.state !== "early-countdown" && (
             <BottomTelemetry
+              message={state.message}
               gForce={
                 parseFloat((telemetry?.accelleration as string) ?? 0) / 9.81
               }

@@ -1,5 +1,5 @@
 import { Azeret_Mono } from "next/font/google";
-import React, { type ReactNode } from "react";
+import React from "react";
 
 type SystemStatesProps = React.HTMLAttributes<HTMLDivElement> & {
   ECU: boolean;

@@ -5,10 +5,13 @@ import React from "react";
 import ControlButton from "./control-button";
 import { api } from "@/trpc/react";
 import { Loader } from "lucide-react";
+import { type OverlayStateData } from "@/server/api/types/overlay";
 
-const OverlayStateControls = () => {
+type OverlayStateControlsProps = {
+  state?: OverlayStateData["state"];
+};
+const OverlayStateControls = ({ state }: OverlayStateControlsProps) => {
   const { mutate, isPending } = api.socket.setOverlayState.useMutation();
-  const { data: overlayState } = api.socket.onOverlayState.useSubscription();
   return (
     <>
       {isPending && (
@@ -20,39 +23,27 @@ const OverlayStateControls = () => {
         <div className="grid min-w-96 grid-cols-2 gap-2.5">
           <ControlButton
             onClick={() => mutate({ state: "early-countdown" })}
-            variant={
-              overlayState?.state === "early-countdown"
-                ? "default"
-                : "secondary"
-            }
+            variant={state === "early-countdown" ? "default" : "secondary"}
           >
             Early countdown
           </ControlButton>
           <ControlButton
             onClick={() => mutate({ state: "final-countdown" })}
-            variant={
-              overlayState?.state === "final-countdown"
-                ? "default"
-                : "secondary"
-            }
+            variant={state === "final-countdown" ? "default" : "secondary"}
           >
             Final countdown
           </ControlButton>
-          <ControlButton
+          {/* <ControlButton
             onClick={() => mutate({ state: "in-flight" })}
-            variant={
-              overlayState?.state === "in-flight" ? "default" : "secondary"
-            }
+            variant={state === "in-flight" ? "default" : "secondary"}
           >
             In-flight
-          </ControlButton>
+          </ControlButton> */}
           <ControlButton
             onClick={() => mutate({ state: "post-flight" })}
-            variant={
-              overlayState?.state === "post-flight" ? "default" : "secondary"
-            }
+            variant={state === "post-flight" ? "default" : "secondary"}
           >
-            Post-flight
+            Empty
           </ControlButton>
         </div>
       </Group>

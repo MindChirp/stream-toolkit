@@ -1,10 +1,13 @@
-import { ServerEventHandlerRetrofit } from "@/lib/telemetry/telemetry-client-retrofit";
-import EventEmitter, { on } from "events";
+import { on } from "events";
 import z from "zod";
+import {
+  ee,
+  overlay as OverlayInstance,
+  serverListener as ServerListener,
+} from "../singleton";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import {
   ClockState,
-  Overlay,
   State,
   type ClockStateData,
   type OverlayStateData,
@@ -15,7 +18,6 @@ import {
  * Used for coordinating events, such as when a piece of telemetry is received from the telemetry backend,
  * and it must be broadcast to the stream overlay UI listener.
  */
-const ee = new EventEmitter();
 const OUTGOING_DATA_CHANNELS = {
   TELEMETRY: "telemetry",
   OVERLAY_STATE: "overlay-state",
@@ -35,18 +37,21 @@ export const UI_DATASOURCE_TARGETS = [
 /**
  * Used for managing the overlay state
  */
-const OverlayInstance = new Overlay();
-OverlayInstance.clock.timeTickCallback((time) => {
-  ee.emit(OUTGOING_DATA_CHANNELS.CLOCK_STATE, {
-    time,
-    state: OverlayInstance.clock.getState(),
-  } as ClockStateData);
-});
+if (!("__clockHooked" in globalThis)) {
+  OverlayInstance.clock.timeTickCallback((time) => {
+    ee.emit(OUTGOING_DATA_CHANNELS.CLOCK_STATE, {
+      time,
+      state: OverlayInstance.clock.getState(),
+    } as ClockStateData);
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  (globalThis as any).__clockHooked = true;
+}
 
 /**
  * Used for listening to UDP/SSE data streaming in from the telemetry backend.
  */
-const ServerListener = new ServerEventHandlerRetrofit();
 
 /**
  * The realtime tRPC router responsible for handling realtime communications.
@@ -86,13 +91,14 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
   onOverlayState: publicProcedure.subscription(async function* (opts) {
     // Yield an initial overlay state.
-    // yield {
-    //   state: OverlayInstance.state,
-    // } as OverlayStateData;
+    yield {
+      ...OverlayInstance.getState(),
+    } as OverlayStateData;
 
     for await (const [data] of on(ee, OUTGOING_DATA_CHANNELS.OVERLAY_STATE, {
       signal: opts.signal,
     })) {
+      console.log("ITEM TO BE YIELDED: ", data);
       const item = data as OverlayStateData;
       yield item;
     }
@@ -109,7 +115,24 @@ export const realtimeRouterRevamped = createTRPCRouter({
     .input(
       z.object(
         {
-          state: z.enum(State),
+          state: z.enum(State).optional(),
+          goNoGoPolls: z
+            .object({
+              show: z.boolean().optional(),
+              states: z.object({
+                range: z.boolean().optional().nullable(),
+                propulsion: z.boolean().optional().nullable(),
+                weather: z.boolean().optional().nullable(),
+                gse: z.boolean().optional().nullable(),
+              }),
+            })
+            .optional(),
+          message: z
+            .object({
+              show: z.boolean().optional(),
+              message: z.string().optional().nullable(),
+            })
+            .optional(),
         },
         {
           description: `Sets the overlay state. The state sent to this endpoint will immideately be reflected in the stream overlay UI.`,
@@ -117,11 +140,27 @@ export const realtimeRouterRevamped = createTRPCRouter({
       ),
     )
     .mutation(({ input }) => {
-      OverlayInstance.state = input.state;
+      if (input.state) {
+        console.log("SETTING OVERLAY STATE");
+        OverlayInstance.setOverlayState(input.state);
+        console.log("OVERLAY STATE SET");
+      }
+
+      if (input.goNoGoPolls) {
+        console.log("SETTING GONOGOPOLLS");
+        OverlayInstance.setGoNoGoPollState(input.goNoGoPolls);
+        console.log("GONOGOPOLLS SET");
+      }
+
+      if (input.message) {
+        OverlayInstance.setMessageState(input.message);
+      }
 
       // Emit event to listeners
       ee.emit(OUTGOING_DATA_CHANNELS.OVERLAY_STATE, {
-        state: input.state,
+        state: OverlayInstance.getState().state,
+        goNoGoPolls: OverlayInstance.getState().goNoGoPolls,
+        message: OverlayInstance.getState().message,
       } satisfies OverlayStateData);
     }),
 
