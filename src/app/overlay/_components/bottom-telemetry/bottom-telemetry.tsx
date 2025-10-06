@@ -6,7 +6,7 @@ import { cn } from "@/utils/cn";
 import NumberFlow from "@number-flow/react";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
-import { Info, PauseIcon } from "lucide-react";
+import { PauseIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Azeret_Mono } from "next/font/google";
 import Image from "next/image";
@@ -179,10 +179,9 @@ const BottomTelemetry = ({
                     y: 10,
                     opacity: 0,
                   }}
-                  className="absolute -top-0 left-0 flex w-full -translate-y-full flex-row items-center gap-5 rounded-lg bg-white px-5 py-2.5"
+                  className="absolute -top-0 left-0 flex w-full -translate-y-full flex-row items-center justify-center gap-5 rounded-lg bg-black/70 px-5 py-2.5 text-center text-white"
                 >
-                  <Info size={18} />
-                  {message.message}
+                  <span>{message.message}</span>
                 </motion.div>
               )}
             </AnimatePresence>

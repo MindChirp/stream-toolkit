@@ -31,7 +31,7 @@ const TelemetryRow = ({
     void onDelete().finally(() => setDeleting(false));
   };
   return (
-    <Card className={cn("w-full", className)} {...props}>
+    <Card className={cn("w-auto min-w-52", className)} {...props}>
       <CardHeader>
         <CardTitle>{name}</CardTitle>
         <CardDescription>{mappings.length} mappings</CardDescription>

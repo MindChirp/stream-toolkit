@@ -1,6 +1,8 @@
 "use client";
 
 import Group from "@/app/_components/group";
+import ComputerStates from "@/app/overlay/_components/computer-states";
+import GoNoGoPolls from "@/app/overlay/_components/go-nogo-polls";
 import {
   Accordion,
   AccordionContent,
@@ -12,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormField } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { type DecodedData } from "@/lib/telemetry/telemetry-client-retrofit";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,24 +24,22 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 
 const formSchema = z.object({
-  navball: z.boolean(),
-  altitude: z.boolean(),
-  speed: z.boolean(),
-  map: z.boolean(),
   polls: z.boolean(),
+  lifesigns: z.boolean(),
 });
 
-const OverlayComponentsControls = () => {
+const OverlayComponentsControls = ({
+  telemetry,
+}: {
+  telemetry?: DecodedData["uiMappedTelemetry"];
+}) => {
   const { mutateAsync, status } = api.socket.setOverlayState.useMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      altitude: true,
-      map: true,
-      navball: true,
       polls: true,
-      speed: true,
+      lifesigns: true,
     },
   });
 
@@ -55,68 +56,45 @@ const OverlayComponentsControls = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <Group title="Overlay components" className="flex flex-col gap-5">
-          {/* <ComponentGroup
-            title="Bottom Overlay bar (try not to touch)"
-            accordion
-          >
-            <FormField
-              name="navball"
-              control={form.control}
-              render={({ field }) => (
-                <FormControl>
-                  <OverlayComponent
-                    component={<Navball />}
-                    value={field.value}
-                    onChange={field.onChange}
-                    id={field.name}
-                  />
-                </FormControl>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="altitude"
-              render={({ field }) => (
-                <OverlayComponent
-                  component={<Gauge label="Altitude" value={0} unit="Meters" />}
-                  id="altitude-gauge"
-                  {...field}
-                />
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="speed"
-              render={({ field }) => (
-                <OverlayComponent
-                  component={<Gauge label="Speed" value={0} unit="km/h" />}
-                  id="speed-gauge"
-                  {...field}
-                />
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="map"
-              render={({ field }) => (
-                <OverlayComponent
-                  component={<MapGauge inert lat={63.786826} lng={9.363207} />}
-                  id="map-gauge"
-                  {...field}
-                />
-              )}
-            />
-
-          </ComponentGroup> */}
           <ComponentGroup>
             <FormField
               control={form.control}
               name="polls"
               render={({ field }) => (
                 <OverlayComponent
-                  component={<h1>Checklist</h1>}
+                  component={
+                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+                      <GoNoGoPolls
+                        className="relative top-0 scale-70"
+                        state={{
+                          gse: true,
+                          propulsion: true,
+                          range: true,
+                          weather: true,
+                        }}
+                      />
+                    </div>
+                  }
                   id="go-no-go-polls"
+                  {...field}
+                />
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lifesigns"
+              render={({ field }) => (
+                <OverlayComponent
+                  component={
+                    <div className="relative flex h-full w-full items-center overflow-hidden">
+                      <ComputerStates
+                        ecu={Boolean(telemetry?.ecu_active)}
+                        fc={Boolean(telemetry?.fc_active)}
+                        className="relative top-0 right-0"
+                      />
+                    </div>
+                  }
+                  id="lifesigns"
                   {...field}
                 />
               )}
@@ -194,7 +172,7 @@ export const OverlayComponent = ({
     <Label
       htmlFor={id}
       className={cn(
-        "bg-background border-border flex flex-col items-center rounded-lg border p-5 shadow-sm",
+        "bg-background border-border flex flex-col items-center justify-between rounded-lg border p-5 shadow-sm",
         className,
       )}
       {...props}

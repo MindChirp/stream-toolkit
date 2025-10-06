@@ -2,10 +2,11 @@ import { cn } from "@/lib/utils";
 import { type OverlayStateData } from "@/server/api/types/overlay";
 import { motion } from "motion/react";
 import { Roboto_Flex } from "next/font/google";
+import { ComponentProps } from "react";
 
 type GoNoGoPollsProps = {
   state: NonNullable<OverlayStateData["goNoGoPolls"]>["states"];
-};
+} & ComponentProps<typeof motion.div>;
 
 const robotoFlex = Roboto_Flex({
   variable: "--font-azeret-mono",
@@ -13,7 +14,7 @@ const robotoFlex = Roboto_Flex({
   subsets: ["latin"],
 });
 
-const GoNoGoPolls = ({ state }: GoNoGoPollsProps) => {
+const GoNoGoPolls = ({ state, className, ...props }: GoNoGoPollsProps) => {
   const getStateValue = (value: boolean | undefined | null) => {
     if (value === undefined) return "tbd";
     return value ? "go" : "nogo";
@@ -37,7 +38,11 @@ const GoNoGoPolls = ({ state }: GoNoGoPollsProps) => {
         },
       }}
       transition={{ duration: 1, ease: "circOut" }}
-      className="absolute top-[30rem] right-0 z-20 flex flex-col gap-1 rounded-tl-lg rounded-bl-3xl bg-black/70 px-10 py-5"
+      className={cn(
+        "absolute top-[30rem] right-0 z-20 flex flex-col gap-1 rounded-tl-lg rounded-bl-3xl bg-black/70 px-10 py-5",
+        className,
+      )}
+      {...props}
     >
       <span
         className={cn(
@@ -81,7 +86,7 @@ const State = ({
       <span>{type}</span>
       <span
         className={cn(
-          "w-20 rounded-md text-center font-semibold",
+          "w-20 min-w-20 rounded-md text-center font-semibold",
           robotoFlex.className,
           state === "go"
             ? "bg-green-500"
