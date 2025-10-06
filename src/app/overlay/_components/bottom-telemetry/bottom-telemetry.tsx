@@ -207,7 +207,7 @@ const BottomTelemetry = ({
               <span className="w-full text-end whitespace-nowrap">
                 Pre Ox Fill
               </span>
-              <Badge variant={"secondary"} className="rounded-full">
+              <Badge variant={"secondary"} className="rounded-lg">
                 <span className="text-2xl font-bold">Ignition</span>
               </Badge>
               <span className="w-full max-w-full text-start">Post Ox Fill</span>
