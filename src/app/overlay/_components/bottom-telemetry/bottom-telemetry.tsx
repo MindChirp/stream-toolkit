@@ -8,7 +8,7 @@ import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
 import { PauseIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { Azeret_Mono } from "next/font/google";
+import { Azeret_Mono, Roboto_Flex } from "next/font/google";
 import Image from "next/image";
 import { type ComponentProps } from "react";
 import Gauge from "../gauge";
@@ -44,6 +44,12 @@ const azeretMono = Azeret_Mono({
   variable: "--font-azeret-mono",
   subsets: ["latin"],
 });
+const robotoFlex = Roboto_Flex({
+  variable: "--font-azeret-mono",
+  axes: ["GRAD", "wdth", "slnt"],
+  subsets: ["latin"],
+});
+
 const BottomTelemetry = ({
   speed = 0,
   altitude = 0,
@@ -206,8 +212,17 @@ const BottomTelemetry = ({
               <span className="w-full text-end whitespace-nowrap">
                 Pre Ox Fill
               </span>
-              <Badge variant={"secondary"} className="rounded-lg">
-                <span className="text-2xl font-bold">Ignition</span>
+              <Badge
+                variant={"secondary"}
+                className={cn(
+                  "rounded-lg bg-black uppercase",
+                  robotoFlex.className,
+                )}
+                style={{
+                  fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
+                }}
+              >
+                <span className="text-lg text-white">Ignition</span>
               </Badge>
               <span className="w-full max-w-full text-start">Post Ox Fill</span>
             </div>
