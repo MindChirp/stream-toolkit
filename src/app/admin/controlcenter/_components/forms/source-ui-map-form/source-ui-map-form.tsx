@@ -34,8 +34,6 @@ import { useFieldArray, useForm } from "react-hook-form";
 import type z from "zod";
 import { UIMappingsRocketPresets } from "../../constants/ui-mappings";
 import { sourceUIMapFormSchema } from "./form-schema";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 
 type SourceUIMapFormProps = {
   onSubmit: (data: z.infer<typeof sourceUIMapFormSchema>) => Promise<unknown>;
@@ -109,21 +107,32 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
           />
         </div>
 
-        <div className="flex flex-col gap-2.5">
-          <Label className="mt-5">Sign of life</Label>
-          <Select defaultValue="none">
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="ecu">ECU Active</SelectItem>
-                <SelectItem value="fc">FC Active</SelectItem>
-                <SelectItem value="none">None</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+        <FormField
+          control={sourceForm.control}
+          name="signOfLife"
+          render={({ field }) => (
+            <FormItem className="mt-5">
+              <FormLabel>Sign of life</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="ecu">ECU Active</SelectItem>
+                      <SelectItem value="fc">FC Active</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         {sourceForm.formState.touchedFields.host && (
           <motion.div

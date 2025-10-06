@@ -27,9 +27,9 @@ const OverlayPage = () => {
           state?.state === "final-countdown") && (
           <SponsorReel key="sponsor-reel" className="absolute top-52 right-0" />
         )} */}
-        {/* <h1 className="absolute top-1/2 left-1/2 text-black">
-          {JSON.stringify(telemetry, null, "\t")}
-        </h1> */}
+        <h1 className="absolute top-1/2 left-1/2 text-black">
+          {JSON.stringify(telemetry?.fc_active, null, "\t")}
+        </h1>
 
         {state?.state === "early-countdown" && (
           <SmallCountdown

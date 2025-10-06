@@ -234,6 +234,7 @@ export const realtimeRouterRevamped = createTRPCRouter({
                telemetry information.`,
           },
         ),
+        signOfLife: z.enum(["ecu", "fc"]).optional(),
       }),
     )
     .mutation(({ input }) => {
@@ -246,10 +247,10 @@ export const realtimeRouterRevamped = createTRPCRouter({
           from: i.rawName,
           uiTarget: i.uiTarget,
         })),
+        input.signOfLife,
       );
 
-      socket.socket.on("message", (msg) => {
-        const data = socket.decode(msg);
+      socket.onMessage((data) => {
         // Update the telemetry object within the overlay
         OverlayInstance.patchTelemetry(data.uiMappedTelemetry);
 

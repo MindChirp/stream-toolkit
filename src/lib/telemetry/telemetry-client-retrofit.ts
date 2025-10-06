@@ -1,11 +1,11 @@
 import dgram from "node:dgram";
 
 // Import the settings JSON file outlining the telemetry struct formats
+import { TRPCError } from "@trpc/server";
 import ip from "ip";
 import struct from "python-struct";
-import SettingJSON from "./settings-retrofit.json";
 import { UI_DATASOURCE_TARGETS } from "./constants/ui-targets";
-import { TRPCError } from "@trpc/server";
+import SettingJSON from "./settings-retrofit.json";
 
 export type UiMap = {
   from: string;
@@ -77,7 +77,12 @@ export class ServerEventHandlerRetrofit {
    * @param source Source IPv4 or IPv6 address with port. For IPv6, use [address]:port format.
    * @returns The created or existing dgram.Socket instance.
    */
-  addSource(host: string, port: number, uiSourceMap: UiMap[]) {
+  addSource(
+    host: string,
+    port: number,
+    uiSourceMap: UiMap[],
+    signOfLife?: "ecu" | "fc",
+  ) {
     // Check if a socket for this port already exists
     const existingSocket = this.#sockets?.find(
       (s) => s.port === port && s.host === host,
@@ -127,6 +132,7 @@ export class ServerEventHandlerRetrofit {
       uiSourceMap,
       host,
       port,
+      signOfLife,
     );
     this.#sockets.push(telemetrySocket);
 
@@ -154,7 +160,7 @@ export class ServerEventHandlerRetrofit {
         (s) => !(s.host === host && s.port === port),
       );
 
-      socket.socket.close();
+      socket.kill();
     } catch (e) {
       console.error("Could not disconnect socket: ", e);
       throw new TRPCError({
@@ -197,6 +203,16 @@ export class TelemetrySocket {
   readonly host: string;
   readonly port: number;
 
+  #messageCallbacks: ((data: DecodedData) => void)[] = [];
+  #signOfLifeTimeout: NodeJS.Timeout | undefined;
+
+  #signOfLife:
+    | {
+        type: "ecu" | "fc";
+        isAlive: boolean;
+      }
+    | undefined;
+
   constructor(
     fstring: string,
     socket: dgram.Socket,
@@ -215,6 +231,7 @@ export class TelemetrySocket {
     }[],
     host: string,
     port: number,
+    signOfLife?: "fc" | "ecu",
   ) {
     this.fstring = fstring;
     this.socket = socket;
@@ -222,6 +239,66 @@ export class TelemetrySocket {
     this.uiDataMap = uiTargets;
     this.host = host;
     this.port = port;
+
+    // If this is a sign of life socket for either the ECU or FC, a listener must be set up
+    if (signOfLife) this.#setupSignOfLifeListener(signOfLife);
+
+    // Set up a socket message listener
+    socket.on("message", (msg: Buffer) =>
+      this.#handleSocketMessage(this.decode(msg)),
+    );
+  }
+
+  #setupSignOfLifeListener(signOfLife: "fc" | "ecu") {
+    this.#signOfLife = {
+      isAlive: false,
+      type: signOfLife,
+    };
+
+    this.#signOfLifeTimeout = setInterval(() => {
+      if (this.#signOfLife) {
+        this.#signOfLife.isAlive = false;
+
+        console.log("NO SIGN OF LIFE");
+
+        const signOfLife = this.#signOfLife
+          ? this.#signOfLife.type === "ecu"
+            ? { ecu_active: this.#signOfLife.isAlive }
+            : { fc_active: this.#signOfLife.isAlive }
+          : {};
+
+        this.#handleSocketMessage({
+          telemetry: signOfLife,
+          uiMappedTelemetry: signOfLife as Record<
+            (typeof UI_DATASOURCE_TARGETS)[number],
+            unknown
+          >,
+          uiMaps: [],
+        });
+
+        // Inform socket listeners of change in lifesign
+      }
+    }, 1000);
+
+    this.socket.on("message", () => {
+      // Reset the timeout
+      if (this.#signOfLife) this.#signOfLife.isAlive = true;
+      this.#signOfLifeTimeout?.refresh();
+    });
+  }
+
+  kill() {
+    this.#signOfLifeTimeout?.close();
+    this.socket.close();
+  }
+
+  #handleSocketMessage(data: DecodedData) {
+    this.#messageCallbacks.forEach((cb) => cb(data));
+    return;
+  }
+
+  onMessage(callback: (data: DecodedData) => void) {
+    this.#messageCallbacks.push(callback);
   }
 
   decode(buff: Buffer<ArrayBufferLike>) {
@@ -247,10 +324,22 @@ export class TelemetrySocket {
       {} as Record<(typeof UI_DATASOURCE_TARGETS)[number], unknown>,
     );
 
+    const signOfLife = this.#signOfLife
+      ? this.#signOfLife.type === "ecu"
+        ? { ecu_active: this.#signOfLife.isAlive }
+        : { fc_active: this.#signOfLife.isAlive }
+      : {};
+
     return {
       uiMaps: this.uiDataMap,
-      telemetry,
-      uiMappedTelemetry: mapped,
+      telemetry: {
+        ...telemetry,
+        ...signOfLife,
+      },
+      uiMappedTelemetry: {
+        ...mapped,
+        ...signOfLife,
+      },
     } as DecodedData;
   }
 }
