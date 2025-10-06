@@ -7,4 +7,8 @@ export const UI_DATASOURCE_TARGETS = [
   "accelleration",
   "lat",
   "lon",
+  "ecu_active",
+  "fc_active",
+  "ecu_state",
+  "fc_state",
 ] as const;

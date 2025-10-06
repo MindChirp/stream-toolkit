@@ -89,7 +89,6 @@ export class Clock {
   stop() {
     if (this.#state === "hold") return;
     this.#state = "hold";
-    console.log("HOLDING");
     if (this.#interval) clearInterval(this.#interval);
     this.#interval = null;
   }

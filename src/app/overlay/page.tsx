@@ -1,22 +1,19 @@
 "use client";
 
-import { useTelemetry } from "@/lib/hooks/useTelemetry";
 import { api } from "@/trpc/react";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import Image from "next/image";
 import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
+import ComputerStates from "./_components/computer-states";
+import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
 import StateTimeline from "./_components/state-timeline";
-import GoNoGoPolls from "./_components/go-nogo-polls";
-import ComputerStates from "./_components/computer-states";
-import SponsorReel from "./_components/sponsor-reel";
-import Image from "next/image";
-import { motion } from "motion/react";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
   // Something wrong in this file
-  const telemetry = useTelemetry();
   // const state = {};
+  const { data: telemetry } = api.socket.onTelemetry.useSubscription();
   const { data: state } = api.socket.onOverlayState.useSubscription();
   const { data: time } = api.socket.onClock.useSubscription();
 
@@ -31,7 +28,7 @@ const OverlayPage = () => {
           <SponsorReel key="sponsor-reel" className="absolute top-52 right-0" />
         )} */}
         {/* <h1 className="absolute top-1/2 left-1/2 text-black">
-          {JSON.stringify(time)}
+          {JSON.stringify(telemetry, null, "\t")}
         </h1> */}
 
         {state?.state === "early-countdown" && (
@@ -47,7 +44,12 @@ const OverlayPage = () => {
           <GoNoGoPolls state={state.goNoGoPolls.states} key="go-no-go-polls" />
         )}
 
-        <ComputerStates key="computer-states" className="top-[24rem]" />
+        <ComputerStates
+          key="computer-states"
+          className="top-[24rem]"
+          ecu={Boolean(telemetry?.ecu_active)}
+          fc={Boolean(telemetry?.fc_active)}
+        />
 
         {/* <ComputerStates
           key="computer-states"

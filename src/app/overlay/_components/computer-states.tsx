@@ -40,13 +40,26 @@ const ComputerStates = ({ ecu, fc, className }: ComputerStatesProps) => {
     >
       <div className="flex flex-col rounded-tl-lg rounded-bl-3xl bg-black/70 px-16 py-2 leading-none font-semibold text-white">
         <span className="flex flex-row items-center justify-between gap-2.5 text-2xl">
-          ECU <div className="size-4 rounded-full bg-red-500" />
+          ECU <IndicatorCircle active={ecu} />
         </span>
         <span className="flex flex-row items-center justify-between gap-2.5 text-2xl">
-          FC <div className="size-4 rounded-full bg-green-500" />
+          FC <IndicatorCircle active={fc} />
         </span>
       </div>
     </motion.div>
+  );
+};
+
+import React from "react";
+
+export const IndicatorCircle = ({ active }: { active?: boolean }) => {
+  return (
+    <div
+      className={cn(
+        "size-4 rounded-full",
+        !active ? "bg-red-500" : "bg-green-500",
+      )}
+    />
   );
 };
 

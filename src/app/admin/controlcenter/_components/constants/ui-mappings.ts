@@ -46,9 +46,9 @@ export const UIMappingsRocketPresets: Record<
     },
     {
       rawName: "yaw",
-      uiTarget: "yaw",
+      uiTarget: "roll",
     },
-    { rawName: "roll", uiTarget: "roll" },
+    { rawName: "roll", uiTarget: "yaw" },
     {
       rawName: "acc_z_moving_average",
       uiTarget: "accelleration",

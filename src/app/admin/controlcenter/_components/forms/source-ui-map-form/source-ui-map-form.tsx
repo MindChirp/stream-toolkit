@@ -34,6 +34,8 @@ import { useFieldArray, useForm } from "react-hook-form";
 import type z from "zod";
 import { UIMappingsRocketPresets } from "../../constants/ui-mappings";
 import { sourceUIMapFormSchema } from "./form-schema";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type SourceUIMapFormProps = {
   onSubmit: (data: z.infer<typeof sourceUIMapFormSchema>) => Promise<unknown>;
@@ -105,6 +107,22 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
               </FormItem>
             )}
           />
+        </div>
+
+        <div className="flex flex-col gap-2.5">
+          <Label className="mt-5">Sign of life</Label>
+          <Select defaultValue="none">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="ecu">ECU Active</SelectItem>
+                <SelectItem value="fc">FC Active</SelectItem>
+                <SelectItem value="none">None</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         {sourceForm.formState.touchedFields.host && (
@@ -205,7 +223,6 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                       onValueChange={(
                         value: (typeof UI_DATASOURCE_TARGETS)[0],
                       ) => {
-                        console.log(value);
                         sourceForm.setValue(
                           `telemetryUIMap.${index}.uiTarget`,
                           value,
@@ -227,12 +244,20 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                           </SelectItem>
                           <SelectItem value="lat">Latitude</SelectItem>
                           <SelectItem value="lon">Longitude</SelectItem>
+                          <SelectItem value="fc_active">FC Active</SelectItem>
+                          <SelectItem value="fc_state">FC State</SelectItem>
+                          <SelectItem value="ecu_active">ECU Active</SelectItem>
+                          <SelectItem value="ecu_state">ECU State</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
 
                     <Button
-                      onClick={() => remove(index)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        remove(index);
+                      }}
+                      type="button"
                       variant={"outline"}
                       className="col-start-3 row-start-2 w-fit"
                     >
@@ -245,7 +270,11 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
             <Button
               className="w-fit"
               variant="secondary"
-              onClick={() => append({ rawName: "", uiTarget: "yaw" })}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                append({ rawName: "", uiTarget: "yaw" });
+              }}
             >
               <PlusIcon />
               Add mapping

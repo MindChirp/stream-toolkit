@@ -4,7 +4,7 @@ import dgram from "node:dgram";
 import ip from "ip";
 import struct from "python-struct";
 import SettingJSON from "./settings-retrofit.json";
-import type { UI_DATASOURCE_TARGETS } from "./constants/ui-targets";
+import { UI_DATASOURCE_TARGETS } from "./constants/ui-targets";
 import { TRPCError } from "@trpc/server";
 
 export type UiMap = {
@@ -98,11 +98,8 @@ export class ServerEventHandlerRetrofit {
     // Create a UDP IPv4 socket
     const newSocket = dgram.createSocket(ip.isV4Format(host) ? "udp4" : "udp6");
 
-    console.log("HERE!");
     try {
-      console.log("HERE 1");
       newSocket.bind(port, host);
-      console.log("HERE 2");
     } catch {
       // Remove socket from the list
       this.#sockets = this.#sockets.filter(
@@ -114,7 +111,6 @@ export class ServerEventHandlerRetrofit {
       });
     }
 
-    console.log("HERE 3");
     // Push socket to list
     const portSettings = this.#getSettingsByPort(port);
     if (!portSettings)
@@ -124,7 +120,6 @@ export class ServerEventHandlerRetrofit {
         message: "No settings found for port " + port,
       });
 
-    console.log("HERE 4");
     const telemetrySocket = new TelemetrySocket(
       portSettings.fstring,
       newSocket,
@@ -134,8 +129,6 @@ export class ServerEventHandlerRetrofit {
       port,
     );
     this.#sockets.push(telemetrySocket);
-
-    console.log("HERE 5");
 
     // Remove the socket if it closes.
     newSocket.on("close", () => {
@@ -156,15 +149,20 @@ export class ServerEventHandlerRetrofit {
       });
 
     try {
-      socket.socket.disconnect();
+      // Remove the socket from the sockets list
+      this.#sockets = this.#sockets.filter(
+        (s) => !(s.host === host && s.port === port),
+      );
+
+      socket.socket.close();
     } catch (e) {
       console.error("Could not disconnect socket: ", e);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        cause: "Could not disconnect from the socket",
+        message: JSON.stringify(e),
+      });
     }
-
-    // Remove the socket from the sockets list
-    this.#sockets = this.#sockets.filter(
-      (s) => !(s.host === host && s.port === port),
-    );
   }
 
   getSources() {
@@ -234,11 +232,25 @@ export class TelemetrySocket {
     // Map the decoded values to their corresponding labels
     // Also include the ui data map
 
+    const telemetry = Object.fromEntries(
+      this.labels.map((label, i) => [label, decoded[i]]),
+    );
+
+    const mapped = (UI_DATASOURCE_TARGETS as readonly string[]).reduce(
+      (acc, key) => {
+        acc[key as (typeof UI_DATASOURCE_TARGETS)[number]] =
+          this.uiDataMap.find((m) => m.uiTarget === key)
+            ? telemetry[this.uiDataMap.find((m) => m.uiTarget === key)!.from]
+            : undefined;
+        return acc;
+      },
+      {} as Record<(typeof UI_DATASOURCE_TARGETS)[number], unknown>,
+    );
+
     return {
       uiMaps: this.uiDataMap,
-      telemetry: Object.fromEntries(
-        this.labels.map((label, i) => [label, decoded[i]]),
-      ),
+      telemetry,
+      uiMappedTelemetry: mapped,
     } as DecodedData;
   }
 }
@@ -246,4 +258,5 @@ export class TelemetrySocket {
 export type DecodedData = {
   uiMaps: UiMap[];
   telemetry: Record<string, unknown>;
+  uiMappedTelemetry: Record<(typeof UI_DATASOURCE_TARGETS)[number], unknown>;
 };

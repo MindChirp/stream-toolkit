@@ -9,10 +9,8 @@ import {
 } from "@/components/ui/card";
 import type { UiMap } from "@/lib/telemetry/telemetry-client-retrofit";
 import { cn } from "@/lib/utils";
-import { TRPCError } from "@trpc/server";
 import { Loader, Trash } from "lucide-react";
 import { useState, type ComponentProps } from "react";
-import { toast } from "sonner";
 
 type TelemetryRowProps = {
   name: string;

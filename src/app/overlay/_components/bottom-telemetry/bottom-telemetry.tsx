@@ -226,7 +226,7 @@ const BottomTelemetry = ({
                 className="flex w-full flex-row justify-start gap-10 pl-10"
               >
                 <SlideAnimation transition={{ delay: 2.45 }}>
-                  <Gauge label="speed" value={Math.round(speed)} unit="km/h" />
+                  <Gauge label="speed" value={Math.round(speed)} unit="m/s" />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 2.6 }}>
                   <Gauge

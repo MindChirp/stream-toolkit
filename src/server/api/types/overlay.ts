@@ -1,5 +1,5 @@
 import { Clock } from "@/lib/clock/clock";
-import type { DecodedData } from "@/lib/telemetry/telemetry-client-retrofit";
+import { type UI_DATASOURCE_TARGETS } from "@/lib/telemetry/constants/ui-targets";
 
 export const State = [
   "final-countdown",
@@ -12,7 +12,6 @@ export const ClockState = ["hold", "active"] as const;
 
 export type State = (typeof State)[number];
 export type ClockState = (typeof ClockState)[number];
-export type TelemetryStateData = DecodedData;
 export type ClockStateData = {
   time: string;
   state: ClockState;
@@ -55,6 +54,22 @@ export class Overlay {
       message: undefined,
     },
   };
+
+  #telemetry: Record<(typeof UI_DATASOURCE_TARGETS)[number], unknown> = {
+    accelleration: 0,
+    altitude: 0,
+    ecu_active: 0,
+    ecu_state: 0,
+    fc_active: 0,
+    fc_state: 0,
+    lat: 0,
+    lon: 0,
+    pitch: 0,
+    roll: 0,
+    velocity: 0,
+    yaw: 0,
+  };
+
   clock: Clock = new Clock("T-003000", "hold");
 
   setOverlayState(state: State) {
@@ -84,6 +99,23 @@ export class Overlay {
   setMessageState(state: { show?: boolean; message?: string | null }) {
     this.#state.message.show = state.show ?? this.#state.message.show;
     this.#state.message.message = state.message ?? this.#state.message.message;
+  }
+
+  patchTelemetry(
+    telemetry: Record<(typeof UI_DATASOURCE_TARGETS)[number], unknown>,
+  ) {
+    for (const key in telemetry) {
+      const typedKey = key as (typeof UI_DATASOURCE_TARGETS)[number];
+
+      if (telemetry[typedKey] === undefined) continue;
+      // if (typedKey === "ecu_active")
+      //   console.log("ECU STATE SET: ", telemetry[typedKey]);
+      this.#telemetry[typedKey] = telemetry[typedKey];
+    }
+  }
+
+  getTelemetry() {
+    return this.#telemetry;
   }
 
   getState() {

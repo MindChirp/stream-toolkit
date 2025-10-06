@@ -5,13 +5,13 @@ import {
   overlay as OverlayInstance,
   serverListener as ServerListener,
 } from "../singleton";
+
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import {
   ClockState,
   State,
   type ClockStateData,
   type OverlayStateData,
-  type TelemetryStateData,
 } from "../types/overlay";
 
 /**
@@ -32,6 +32,10 @@ export const UI_DATASOURCE_TARGETS = [
   "accelleration",
   "lat",
   "lon",
+  "fc_active",
+  "ecu_active",
+  "fc_state",
+  "ecu_state",
 ] as const;
 
 /**
@@ -69,7 +73,10 @@ export const realtimeRouterRevamped = createTRPCRouter({
     for await (const [data] of on(ee, OUTGOING_DATA_CHANNELS.TELEMETRY, {
       signal: opts.signal,
     })) {
-      const item = data as TelemetryStateData;
+      const item = data as Record<
+        (typeof UI_DATASOURCE_TARGETS)[number],
+        unknown
+      >;
       yield item;
     }
   }),
@@ -98,7 +105,6 @@ export const realtimeRouterRevamped = createTRPCRouter({
     for await (const [data] of on(ee, OUTGOING_DATA_CHANNELS.OVERLAY_STATE, {
       signal: opts.signal,
     })) {
-      console.log("ITEM TO BE YIELDED: ", data);
       const item = data as OverlayStateData;
       yield item;
     }
@@ -141,15 +147,11 @@ export const realtimeRouterRevamped = createTRPCRouter({
     )
     .mutation(({ input }) => {
       if (input.state) {
-        console.log("SETTING OVERLAY STATE");
         OverlayInstance.setOverlayState(input.state);
-        console.log("OVERLAY STATE SET");
       }
 
       if (input.goNoGoPolls) {
-        console.log("SETTING GONOGOPOLLS");
         OverlayInstance.setGoNoGoPollState(input.goNoGoPolls);
-        console.log("GONOGOPOLLS SET");
       }
 
       if (input.message) {
@@ -248,8 +250,10 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
       socket.socket.on("message", (msg) => {
         const data = socket.decode(msg);
-        // console.log("Received telemetry data:", data);
-        ee.emit("telemetry", data);
+        // Update the telemetry object within the overlay
+        OverlayInstance.patchTelemetry(data.uiMappedTelemetry);
+
+        ee.emit("telemetry", OverlayInstance.getTelemetry());
       });
 
       return;

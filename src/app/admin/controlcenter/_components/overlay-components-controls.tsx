@@ -1,9 +1,6 @@
 "use client";
 
 import Group from "@/app/_components/group";
-import Gauge from "@/app/overlay/_components/gauge";
-import MapGauge from "@/app/overlay/_components/map-gauge";
-import Navball from "@/app/overlay/_components/navball";
 import {
   Accordion,
   AccordionContent,
@@ -12,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormControl, FormField } from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -58,7 +55,7 @@ const OverlayComponentsControls = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)}>
         <Group title="Overlay components" className="flex flex-col gap-5">
-          <ComponentGroup
+          {/* <ComponentGroup
             title="Bottom Overlay bar (try not to touch)"
             accordion
           >
@@ -111,9 +108,8 @@ const OverlayComponentsControls = () => {
               )}
             />
 
-            {/* <SponsorReel /> */}
-          </ComponentGroup>
-          <ComponentGroup title="Right side">
+          </ComponentGroup> */}
+          <ComponentGroup>
             <FormField
               control={form.control}
               name="polls"
@@ -141,7 +137,7 @@ const OverlayComponentsControls = () => {
 };
 
 type ComponentGroupProps = {
-  title: string;
+  title?: string;
   children?: React.ReactNode;
   accordion?: boolean;
 };
@@ -154,7 +150,7 @@ export const ComponentGroup = ({
     <div className="flex flex-col gap-5">
       {accordion && (
         <Accordion type="single" collapsible>
-          <AccordionItem value={title}>
+          <AccordionItem value={title ?? "accordion" + Math.random()}>
             <AccordionTrigger>
               <span className="mt-2.5 font-semibold">{title}</span>
             </AccordionTrigger>
@@ -167,10 +163,12 @@ export const ComponentGroup = ({
 
       {!accordion && (
         <>
-          <div className="flex flex-col gap-1">
-            <span>{title}</span>
-            <Separator />
-          </div>
+          {title && (
+            <div className="flex flex-col gap-1">
+              <span>{title}</span>
+              <Separator />
+            </div>
+          )}
           <div className="grid grid-cols-3 gap-2.5">{children}</div>
         </>
       )}
