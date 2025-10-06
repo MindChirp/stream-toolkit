@@ -44,12 +44,14 @@ const OverlayPage = () => {
           <GoNoGoPolls state={state.goNoGoPolls.states} key="go-no-go-polls" />
         )}
 
-        <ComputerStates
-          key="computer-states"
-          className="top-[24rem]"
-          ecu={Boolean(telemetry?.ecu_active)}
-          fc={Boolean(telemetry?.fc_active)}
-        />
+        {state?.signOfLife?.show && (
+          <ComputerStates
+            key="computer-states"
+            className="top-[24rem]"
+            ecu={Boolean(telemetry?.ecu_active)}
+            fc={Boolean(telemetry?.fc_active)}
+          />
+        )}
 
         {/* <ComputerStates
           key="computer-states"

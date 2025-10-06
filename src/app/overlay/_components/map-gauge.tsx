@@ -53,6 +53,7 @@ const MapGauge = ({ inert = false, zoomOverride, lat, lng }: MapGaugeProps) => {
       <GoogleMapReact
         draggable={false}
         options={{
+          mapTypeId: "hybrid",
           fullscreenControl: false,
           disableDefaultUI: true,
           zoomControl: false,
@@ -88,7 +89,7 @@ const RocketIcon = ({
   return (
     <div
       className={cn(
-        "size-5 -translate-1/2 rounded-full bg-white/30 backdrop-blur-[3px]",
+        "border-border size-5 -translate-1/2 rounded-full border bg-white/30 shadow-sm backdrop-blur-[3px]",
         className,
       )}
     />

@@ -23,6 +23,7 @@ const OUTGOING_DATA_CHANNELS = {
   OVERLAY_STATE: "overlay-state",
   CLOCK_STATE: "clock-state",
 };
+
 export const UI_DATASOURCE_TARGETS = [
   "altitude",
   "velocity",
@@ -139,6 +140,7 @@ export const realtimeRouterRevamped = createTRPCRouter({
               message: z.string().optional().nullable(),
             })
             .optional(),
+          signOfLife: z.object({ show: z.boolean() }).optional(),
         },
         {
           description: `Sets the overlay state. The state sent to this endpoint will immideately be reflected in the stream overlay UI.`,
@@ -158,11 +160,16 @@ export const realtimeRouterRevamped = createTRPCRouter({
         OverlayInstance.setMessageState(input.message);
       }
 
+      if (input.signOfLife) {
+        OverlayInstance.setSignOfLifeState(input.signOfLife);
+      }
+
       // Emit event to listeners
       ee.emit(OUTGOING_DATA_CHANNELS.OVERLAY_STATE, {
         state: OverlayInstance.getState().state,
         goNoGoPolls: OverlayInstance.getState().goNoGoPolls,
         message: OverlayInstance.getState().message,
+        signOfLife: OverlayInstance.getSignOfLifeState(),
       } satisfies OverlayStateData);
     }),
 

@@ -49,6 +49,9 @@ const OverlayComponentsControls = ({
         show: data.polls,
         states: {},
       },
+      signOfLife: {
+        show: data.lifesigns,
+      },
     });
   };
 

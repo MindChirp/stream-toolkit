@@ -27,6 +27,7 @@ export type OverlayStateData = {
       gse?: boolean | null;
     };
   };
+  signOfLife?: { show: boolean };
   message?: {
     show: boolean;
     message?: string | null;
@@ -38,8 +39,10 @@ export class Overlay {
     state: State;
     goNoGoPolls: NonNullable<OverlayStateData["goNoGoPolls"]>;
     message: NonNullable<OverlayStateData["message"]>;
+    signOfLife: NonNullable<OverlayStateData["signOfLife"]>;
   } = {
     state: "early-countdown",
+    signOfLife: { show: true },
     goNoGoPolls: {
       show: false,
       states: {
@@ -99,6 +102,14 @@ export class Overlay {
   setMessageState(state: { show?: boolean; message?: string | null }) {
     this.#state.message.show = state.show ?? this.#state.message.show;
     this.#state.message.message = state.message ?? this.#state.message.message;
+  }
+
+  setSignOfLifeState(state: { show: boolean }) {
+    console.log("SIGNOFLIFE ", state);
+    this.#state.signOfLife.show = state.show;
+  }
+  getSignOfLifeState() {
+    return this.#state.signOfLife;
   }
 
   patchTelemetry(
