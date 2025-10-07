@@ -6,9 +6,9 @@ import { cn } from "@/utils/cn";
 import NumberFlow from "@number-flow/react";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
-import { PauseIcon } from "lucide-react";
+import { Info, PauseIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { Azeret_Mono, Roboto_Flex } from "next/font/google";
+import { Azeret_Mono } from "next/font/google";
 import Image from "next/image";
 import { type ComponentProps } from "react";
 import Gauge from "../gauge";
@@ -44,12 +44,6 @@ const azeretMono = Azeret_Mono({
   variable: "--font-azeret-mono",
   subsets: ["latin"],
 });
-const robotoFlex = Roboto_Flex({
-  variable: "--font-azeret-mono",
-  axes: ["GRAD", "wdth", "slnt"],
-  subsets: ["latin"],
-});
-
 const BottomTelemetry = ({
   speed = 0,
   altitude = 0,
@@ -185,9 +179,10 @@ const BottomTelemetry = ({
                     y: 10,
                     opacity: 0,
                   }}
-                  className="absolute -top-0 left-0 flex w-full -translate-y-full flex-row items-center justify-center gap-5 rounded-lg bg-black/70 px-5 py-2.5 text-center text-white"
+                  className="absolute -top-0 left-0 flex w-full -translate-y-full flex-row items-center gap-5 rounded-lg bg-white px-5 py-2.5"
                 >
-                  <span>{message.message}</span>
+                  <Info size={18} />
+                  {message.message}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -212,17 +207,8 @@ const BottomTelemetry = ({
               <span className="w-full text-end whitespace-nowrap">
                 Pre Ox Fill
               </span>
-              <Badge
-                variant={"secondary"}
-                className={cn(
-                  "rounded-lg bg-black uppercase",
-                  robotoFlex.className,
-                )}
-                style={{
-                  fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
-                }}
-              >
-                <span className="text-lg text-white">Ignition</span>
+              <Badge variant={"secondary"} className="rounded-lg">
+                <span className="text-2xl font-bold">Ignition</span>
               </Badge>
               <span className="w-full max-w-full text-start">Post Ox Fill</span>
             </div>
@@ -240,7 +226,7 @@ const BottomTelemetry = ({
                 className="flex w-full flex-row justify-start gap-10 pl-10"
               >
                 <SlideAnimation transition={{ delay: 2.45 }}>
-                  <Gauge label="speed" value={Math.round(speed)} unit="m/s" />
+                  <Gauge label="speed" value={speed.toFixed(2)} unit="m/s" />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 2.6 }}>
                   <Gauge

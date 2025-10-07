@@ -1,11 +1,11 @@
 import EventEmitter from "events";
 import { Overlay } from "./types/overlay";
-import { ServerEventHandlerRetrofit } from "@/lib/telemetry/telemetry-client-retrofit";
+import { ServerEventHandlerHeimdall } from "@/lib/telemetry/telemetry-client-heimdall";
 
 const g = globalThis as {
   __ee?: EventEmitter;
   __overlay?: Overlay;
-  __serverListener?: ServerEventHandlerRetrofit;
+  __serverListener?: ServerEventHandlerHeimdall;
 };
 
 export const ee: EventEmitter = g.__ee ?? new EventEmitter();
@@ -19,6 +19,6 @@ if (!g.__ee) {
 export const overlay: Overlay = g.__overlay ?? new Overlay();
 g.__overlay ??= overlay;
 
-export const serverListener: ServerEventHandlerRetrofit =
-  g.__serverListener ?? new ServerEventHandlerRetrofit();
+export const serverListener: ServerEventHandlerHeimdall =
+  g.__serverListener ?? new ServerEventHandlerHeimdall();
 g.__serverListener ??= serverListener;

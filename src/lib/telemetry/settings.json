@@ -158,7 +158,7 @@
         "bme_ex_altitude",
         "timestamp"
       ],
-      "fstring": "< 32f Q",
+      "fstring": "< 31f Q",
       "aggregation_factor": 1
     },
     "navigation": {
