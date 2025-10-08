@@ -7,7 +7,7 @@ import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
 import ComputerStates from "./_components/computer-states";
 import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
-import StateTimeline from "./_components/state-timeline";
+import { Badge } from "@/components/ui/badge";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
@@ -20,16 +20,28 @@ const OverlayPage = () => {
   return (
     <div className="relative flex h-screen max-h-screen w-full overflow-hidden">
       <AnimatePresence>
-        {state?.state && state?.state !== "post-flight" && (
-          <StateTimeline key="state-timeline" state={state.state} />
-        )}
         {/* {(state?.state === "early-countdown" ||
           state?.state === "final-countdown") && (
           <SponsorReel key="sponsor-reel" className="absolute top-52 right-0" />
         )} */}
-        {/* <h1 className="absolute top-1/2 left-1/2 text-black">
-          {JSON.stringify(telemetry?.fc_active, null, "\t")}
-        </h1> */}
+        <div
+          className="absolute top-1/4 left-1/2 flex flex-col gap-2.5 text-lg"
+          key="overlay-debug"
+        >
+          <h1 className="flex flex-row items-center justify-between gap-5">
+            FC State
+            <Badge className="text-2xl">
+              {JSON.stringify(telemetry?.fc_state)}
+            </Badge>
+          </h1>
+
+          <h1 className="flex flex-row items-center justify-between gap-5">
+            ECU State
+            <Badge className="text-2xl">
+              {JSON.stringify(telemetry?.ecu_state)}
+            </Badge>
+          </h1>
+        </div>
 
         {state?.state === "early-countdown" && (
           <SmallCountdown
@@ -95,6 +107,8 @@ const OverlayPage = () => {
               gForce={
                 parseFloat((telemetry?.accelleration as string) ?? 0) / 9.81
               }
+              ecuFsmState={telemetry?.ecu_state as number}
+              fcFsmState={telemetry?.fc_state as number}
               position={{
                 lat: telemetry?.lat as number,
                 lon: telemetry?.lon as number,

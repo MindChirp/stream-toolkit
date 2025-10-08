@@ -10,5 +10,5 @@ export const sourceUIMapFormSchema = z.object({
       uiTarget: z.enum(UI_DATASOURCE_TARGETS),
     }),
   ),
-  signOfLife: z.enum(["ecu", "fc"]).optional(),
+  signOfLife: z.enum(["ecu", "fc", "none"]).optional(),
 });

@@ -45,6 +45,9 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
     resolver: zodResolver(sourceUIMapFormSchema),
     defaultValues: {
       host: "",
+      port: 0o0,
+      signOfLife: "none",
+      telemetryUIMap: [],
     },
   });
 
@@ -98,7 +101,6 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                     onChange={(e) => {
                       field.onChange(parseInt(e.currentTarget.value));
                     }}
-                    placeholder="1234"
                   />
                 </FormControl>
                 <FormMessage />
@@ -184,6 +186,15 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                   </SelectItem>
                   <SelectItem value="heimdallP6005">
                     Heimdall Port 6005
+                  </SelectItem>
+                  <SelectItem value="heimdallP6004">
+                    Heimdall Port 6004
+                  </SelectItem>
+                  <SelectItem value="heimdallP6002">
+                    Heimdall Port 6002
+                  </SelectItem>
+                  <SelectItem value="heimdallP9994">
+                    Heimdall Port 9994
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>

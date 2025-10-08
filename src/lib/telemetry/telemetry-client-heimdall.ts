@@ -70,7 +70,7 @@ export class ServerEventHandlerHeimdall {
    * @param source Source IPv4 or IPv6 address with port. For IPv6, use [address]:port format.
    * @returns The created or existing dgram.Socket instance.
    */
-  addSource(
+  async addSource(
     host: string,
     port: number,
     uiSourceMap: UiMap[],
@@ -81,10 +81,7 @@ export class ServerEventHandlerHeimdall {
       (s) => s.port === port && s.host === host,
     );
 
-    // Fail silently (just return the existing port)
     if (existingSocket) return existingSocket;
-
-    // Check IP protocol (IPv4 vs IPv6)
 
     const validProtocol = ip.isV4Format(host) ?? ip.isV6Format(host);
     if (!validProtocol)
@@ -93,21 +90,43 @@ export class ServerEventHandlerHeimdall {
         message: "Invalid IP address format",
       });
 
-    // Create a UDP IPv4 socket
     const newSocket = dgram.createSocket(ip.isV4Format(host) ? "udp4" : "udp6");
 
-    try {
-      newSocket.bind(port, host);
-    } catch {
-      // Remove socket from the list
-      this.#sockets = this.#sockets.filter(
-        (s) => !(s.host === host && s.port === port),
-      );
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Could not open socket to telemetry source",
+    // Attach a temporary error handler to catch bind errors and clean up
+    const cleanupOnError = (err: Error) => {
+      try {
+        newSocket.close();
+      } catch {}
+    };
+
+    // Wait for either 'listening' or 'error' from bind
+    await new Promise<void>((resolve, reject) => {
+      newSocket.once("error", (err) => {
+        // reject so the outer try/catch can handle it
+        cleanupOnError(err);
+        reject(err);
       });
-    }
+
+      try {
+        newSocket.bind(port, host);
+      } catch (err) {
+        // some errors may be thrown synchronously
+        reject(err as Error);
+      }
+
+      newSocket.once("listening", () => resolve());
+    }).catch((err) => {
+      // make sure socket is closed and not stored
+      try {
+        newSocket.close();
+      } catch {}
+      // rethrow as TRPCError so callers can catch
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Could not bind socket: " + String(err),
+        cause: err,
+      });
+    });
 
     // Push socket to list
     const portSettings = this.#getSettingsByPort(port);
@@ -129,7 +148,16 @@ export class ServerEventHandlerHeimdall {
     );
     this.#sockets.push(telemetrySocket);
 
-    // Remove the socket if it closes.
+    // Attach a runtime error handler to avoid uncaught exceptions later
+    newSocket.on("error", (err) => {
+      console.error("Socket error:", err);
+      // remove from list and close
+      this.#sockets = this.#sockets.filter((s) => s !== telemetrySocket);
+      try {
+        newSocket.close();
+      } catch {}
+    });
+
     newSocket.on("close", () => {
       this.#sockets = this.#sockets.filter((s) => s !== telemetrySocket);
     });

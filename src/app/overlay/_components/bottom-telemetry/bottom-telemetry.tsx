@@ -1,12 +1,11 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import type { State } from "@/types/states";
 import { cn } from "@/utils/cn";
 import NumberFlow from "@number-flow/react";
 import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
-import { Info, PauseIcon } from "lucide-react";
+import { PauseIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Azeret_Mono } from "next/font/google";
 import Image from "next/image";
@@ -14,6 +13,7 @@ import { type ComponentProps } from "react";
 import Gauge from "../gauge";
 import MapGauge from "../map-gauge";
 import Navball from "../navball";
+import StateTimeline from "../state-timeline";
 
 type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
   timestamp?: string;
@@ -38,12 +38,15 @@ type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
     show: boolean;
     message?: string | null;
   };
+  fcFsmState?: number;
+  ecuFsmState?: number;
 };
 
 const azeretMono = Azeret_Mono({
   variable: "--font-azeret-mono",
   subsets: ["latin"],
 });
+
 const BottomTelemetry = ({
   speed = 0,
   altitude = 0,
@@ -54,6 +57,8 @@ const BottomTelemetry = ({
   clockState,
   message,
   position,
+  fcFsmState,
+  ecuFsmState,
   ...props
 }: BottomTelemetryProps) => {
   return (
@@ -165,7 +170,7 @@ const BottomTelemetry = ({
           <div className="flex flex-col">
             <AnimatePresence>
               {message?.show && (
-                <motion.div
+                <motion.span
                   key="message-box"
                   initial={{
                     y: 10,
@@ -179,11 +184,10 @@ const BottomTelemetry = ({
                     y: 10,
                     opacity: 0,
                   }}
-                  className="absolute -top-0 left-0 flex w-full -translate-y-full flex-row items-center gap-5 rounded-lg bg-white px-5 py-2.5"
+                  className="absolute -top-0 left-0 w-full -translate-y-full flex-row gap-5 rounded-lg bg-black/70 px-5 py-2.5 text-center font-semibold text-white"
                 >
-                  <Info size={18} />
                   {message.message}
-                </motion.div>
+                </motion.span>
               )}
             </AnimatePresence>
             <Header
@@ -203,15 +207,9 @@ const BottomTelemetry = ({
               <NumberFlow value={parseInt(clockState.time.slice(6, 7))} />
               <NumberFlow value={parseInt(clockState.time.slice(7, 8))} />
             </Header>
-            <div className="absolute bottom-0 grid w-full translate-y-full grid-cols-[min-content_auto_min-content] items-center justify-center gap-2.5 text-center whitespace-nowrap text-white">
-              <span className="w-full text-end whitespace-nowrap">
-                Pre Ox Fill
-              </span>
-              <Badge variant={"secondary"} className="rounded-lg">
-                <span className="text-2xl font-bold">Ignition</span>
-              </Badge>
-              <span className="w-full max-w-full text-start">Post Ox Fill</span>
-            </div>
+            <AnimatePresence>
+              <StateTimeline ecu_state={ecuFsmState} fc_state={fcFsmState} />
+            </AnimatePresence>
           </div>
         </div>
         <div
@@ -226,7 +224,11 @@ const BottomTelemetry = ({
                 className="flex w-full flex-row justify-start gap-10 pl-10"
               >
                 <SlideAnimation transition={{ delay: 2.45 }}>
-                  <Gauge label="speed" value={speed.toFixed(2)} unit="m/s" />
+                  <Gauge
+                    label="speed"
+                    value={Math.abs(speed).toFixed(0)}
+                    unit="m/s"
+                  />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 2.6 }}>
                   <Gauge
@@ -236,7 +238,11 @@ const BottomTelemetry = ({
                   />
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 2.75 }}>
-                  <Gauge label="Accel" value={gForce.toFixed(1)} unit="G" />
+                  <Gauge
+                    label="Accel"
+                    value={Math.abs(gForce).toFixed(1)}
+                    unit="G"
+                  />
                 </SlideAnimation>
               </motion.div>
             )}

@@ -13,6 +13,7 @@ import {
   type ClockStateData,
   type OverlayStateData,
 } from "../types/overlay";
+import { TRPCError } from "@trpc/server";
 
 /**
  * Used for coordinating events, such as when a piece of telemetry is received from the telemetry backend,
@@ -244,25 +245,33 @@ export const realtimeRouterRevamped = createTRPCRouter({
         signOfLife: z.enum(["ecu", "fc"]).optional(),
       }),
     )
-    .mutation(({ input }) => {
+    .mutation(async ({ input }) => {
       // Create a telemetry source
 
-      const socket = ServerListener.addSource(
-        input.host,
-        input.port,
-        input.telemetryUIMap.map((i) => ({
-          from: i.rawName,
-          uiTarget: i.uiTarget,
-        })),
-        input.signOfLife,
-      );
+      try {
+        const socket = await ServerListener.addSource(
+          input.host,
+          input.port,
+          input.telemetryUIMap.map((i) => ({
+            from: i.rawName,
+            uiTarget: i.uiTarget,
+          })),
+          input.signOfLife,
+        );
 
-      socket.onMessage((data) => {
-        // Update the telemetry object within the overlay
-        OverlayInstance.patchTelemetry(data.uiMappedTelemetry);
+        socket.onMessage((data) => {
+          // Update the telemetry object within the overlay
+          OverlayInstance.patchTelemetry(data.uiMappedTelemetry);
 
-        ee.emit("telemetry", OverlayInstance.getTelemetry());
-      });
+          ee.emit("telemetry", OverlayInstance.getTelemetry());
+        });
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          cause: "Something went wrong while setting up socket",
+          message: JSON.stringify(e),
+        });
+      }
 
       return;
     }),
