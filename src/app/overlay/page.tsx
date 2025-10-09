@@ -25,7 +25,7 @@ const OverlayPage = () => {
           <SponsorReel key="sponsor-reel" className="absolute top-52 right-0" />
         )} */}
         <div
-          className="absolute top-1/4 left-1/2 flex flex-col gap-2.5 text-lg"
+          className="absolute top-1/4 left-1/2 hidden flex-col gap-2.5 text-lg"
           key="overlay-debug"
         >
           <h1 className="flex flex-row items-center justify-between gap-5">

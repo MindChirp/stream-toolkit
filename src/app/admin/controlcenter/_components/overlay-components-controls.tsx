@@ -70,10 +70,14 @@ const OverlayComponentsControls = ({
                       <GoNoGoPolls
                         className="relative top-0 scale-70"
                         state={{
-                          gse: true,
+                          operations: true,
+                          pad: true,
                           propulsion: true,
+                          pyro: true,
                           range: true,
-                          weather: true,
+                          recovery: true,
+                          telemetry: true,
+                          trajectory: true,
                         }}
                       />
                     </div>

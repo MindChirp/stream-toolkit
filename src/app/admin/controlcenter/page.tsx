@@ -15,8 +15,8 @@ const ControlCenter = () => {
   // const states = undefined;
 
   return (
-    <div className="flex w-full flex-col gap-5">
-      <Header>Control Center</Header>
+    <div className="flex w-full flex-col gap-10">
+      <Header>Overlay Controls</Header>
       <div className="grid w-full grid-cols-1 gap-5 xl:grid-cols-2">
         <OverlayStateControls state={states?.state} />
         <OverlayComponentsControls />

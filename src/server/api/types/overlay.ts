@@ -12,6 +12,7 @@ export const ClockState = ["hold", "active"] as const;
 
 export type State = (typeof State)[number];
 export type ClockState = (typeof ClockState)[number];
+export type PollState = "go" | "nogo" | "tbd";
 export type ClockStateData = {
   time: string;
   state: ClockState;
@@ -21,10 +22,14 @@ export type OverlayStateData = {
   goNoGoPolls?: {
     show: boolean;
     states: {
-      range?: boolean | null;
-      propulsion?: boolean | null;
-      weather?: boolean | null;
-      gse?: boolean | null;
+      propulsion: PollState;
+      recovery: PollState;
+      range: PollState;
+      pad: PollState;
+      telemetry: PollState;
+      trajectory: PollState;
+      pyro: PollState;
+      operations: PollState;
     };
   };
   signOfLife?: { show: boolean };
@@ -46,10 +51,14 @@ export class Overlay {
     goNoGoPolls: {
       show: false,
       states: {
-        gse: null,
-        propulsion: null,
-        range: null,
-        weather: null,
+        operations: "tbd",
+        pad: "tbd",
+        propulsion: "tbd",
+        pyro: "tbd",
+        range: "tbd",
+        recovery: "tbd",
+        telemetry: "tbd",
+        trajectory: "tbd",
       },
     },
     message: {
@@ -81,7 +90,7 @@ export class Overlay {
 
   setGoNoGoPollState(state: {
     show?: boolean;
-    states: NonNullable<OverlayStateData["goNoGoPolls"]>["states"];
+    states: Partial<NonNullable<OverlayStateData["goNoGoPolls"]>["states"]>;
   }) {
     // Go through each state, and only override the value if it is anything other
     // than undefined

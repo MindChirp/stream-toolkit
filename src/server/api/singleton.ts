@@ -1,7 +1,6 @@
-import { ServerEventHandlerRetrofit } from "@/lib/telemetry/telemetry-client-retrofit";
+import { ServerEventHandlerHeimdall } from "@/lib/telemetry/telemetry-client-heimdall";
 import EventEmitter from "events";
 import { Overlay } from "./types/overlay";
-import { ServerEventHandlerHeimdall } from "@/lib/telemetry/telemetry-client-heimdall";
 
 type Handler = ServerEventHandlerHeimdall;
 

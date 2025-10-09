@@ -6,6 +6,7 @@ import {
   serverListener as ServerListener,
 } from "../singleton";
 
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import {
   ClockState,
@@ -13,7 +14,8 @@ import {
   type ClockStateData,
   type OverlayStateData,
 } from "../types/overlay";
-import { TRPCError } from "@trpc/server";
+
+const PollStates = ["go", "nogo", "tbd"] as const;
 
 /**
  * Used for coordinating events, such as when a piece of telemetry is received from the telemetry backend,
@@ -128,10 +130,14 @@ export const realtimeRouterRevamped = createTRPCRouter({
             .object({
               show: z.boolean().optional(),
               states: z.object({
-                range: z.boolean().optional().nullable(),
-                propulsion: z.boolean().optional().nullable(),
-                weather: z.boolean().optional().nullable(),
-                gse: z.boolean().optional().nullable(),
+                propulsion: z.enum(PollStates).optional(),
+                recovery: z.enum(PollStates).optional(),
+                range: z.enum(PollStates).optional(),
+                pad: z.enum(PollStates).optional(),
+                telemetry: z.enum(PollStates).optional(),
+                trajectory: z.enum(PollStates).optional(),
+                pyro: z.enum(PollStates).optional(),
+                operations: z.enum(PollStates).optional(),
               }),
             })
             .optional(),

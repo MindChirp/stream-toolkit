@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
-import { type OverlayStateData } from "@/server/api/types/overlay";
+import { PollState, type OverlayStateData } from "@/server/api/types/overlay";
 import { motion } from "motion/react";
 import { Roboto_Flex } from "next/font/google";
-import { ComponentProps } from "react";
+import { type ComponentProps } from "react";
 
 type GoNoGoPollsProps = {
   state: NonNullable<OverlayStateData["goNoGoPolls"]>["states"];
@@ -15,11 +15,6 @@ const robotoFlex = Roboto_Flex({
 });
 
 const GoNoGoPolls = ({ state, className, ...props }: GoNoGoPollsProps) => {
-  const getStateValue = (value: boolean | undefined | null) => {
-    if (value === undefined) return "tbd";
-    return value ? "go" : "nogo";
-  };
-
   return (
     <motion.div
       key="go-no-go-polls"
@@ -55,10 +50,15 @@ const GoNoGoPolls = ({ state, className, ...props }: GoNoGoPollsProps) => {
       >
         Checklist
       </span>
-      <State type="Range" state={getStateValue(state?.range)} />
-      <State type="Weather" state={getStateValue(state?.weather)} />
-      <State type="Propulsion" state={getStateValue(state?.propulsion)} />
-      <State type="Filling station" state={getStateValue(state?.gse)} />
+
+      <State type="Propulsion" state={state.propulsion} />
+      <State type="Recovery" state={state.recovery} />
+      <State type="Range" state={state.range} />
+      <State type="Pad" state={state.pad} />
+      <State type="Telemetry" state={state.telemetry} />
+      <State type="Trajectory" state={state.trajectory} />
+      <State type="Pyro" state={state.pyro} />
+      <State type="Operations" state={state.operations} />
     </motion.div>
   );
 };
@@ -69,13 +69,7 @@ const StateLabelMap = {
   tbd: "TBD",
 };
 
-const State = ({
-  type,
-  state,
-}: {
-  type: string;
-  state: "go" | "nogo" | "tbd";
-}) => {
+const State = ({ type, state }: { type: string; state: PollState }) => {
   return (
     <div
       className={cn(
