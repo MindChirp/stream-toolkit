@@ -148,6 +148,12 @@ export const realtimeRouterRevamped = createTRPCRouter({
             })
             .optional(),
           signOfLife: z.object({ show: z.boolean() }).optional(),
+          sponsor: z
+            .object({
+              show: z.boolean().optional(),
+              sponsorIndex: z.number().optional(),
+            })
+            .optional(),
         },
         {
           description: `Sets the overlay state. The state sent to this endpoint will immideately be reflected in the stream overlay UI.`,
@@ -171,12 +177,17 @@ export const realtimeRouterRevamped = createTRPCRouter({
         OverlayInstance.setSignOfLifeState(input.signOfLife);
       }
 
+      if (input.sponsor) {
+        OverlayInstance.setSponsorState(input.sponsor);
+      }
+
       // Emit event to listeners
       ee.emit(OUTGOING_DATA_CHANNELS.OVERLAY_STATE, {
         state: OverlayInstance.getState().state,
         goNoGoPolls: OverlayInstance.getState().goNoGoPolls,
         message: OverlayInstance.getState().message,
-        signOfLife: OverlayInstance.getSignOfLifeState(),
+        signOfLife: OverlayInstance.getState().signOfLife,
+        sponsor: OverlayInstance.getState().sponsor,
       } satisfies OverlayStateData);
     }),
 

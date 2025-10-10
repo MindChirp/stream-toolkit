@@ -9,6 +9,7 @@ import TimerControls from "./_components/timer-controls";
 import CheckStates from "./_components/check-states";
 import { api } from "@/trpc/react";
 import MessageControls from "./_components/message-controls";
+import SponsorControls from "./_components/sponsor-controls";
 
 const ControlCenter = () => {
   const { data: states } = api.socket.onOverlayState.useSubscription();
@@ -28,6 +29,7 @@ const ControlCenter = () => {
           <TelemetrySource />
         </Group>
         <MessageControls />
+        <SponsorControls />
         {/* <Group
           title="Danger Area"
           variant="danger"

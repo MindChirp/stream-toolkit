@@ -12,7 +12,7 @@ import { Loader } from "lucide-react";
 import { useState } from "react";
 
 type CheckStatesProps = {
-  goNoGoPolls: NonNullable<OverlayStateData["goNoGoPolls"]>;
+  goNoGoPolls?: OverlayStateData["goNoGoPolls"];
 };
 
 const CheckStates = ({ goNoGoPolls }: CheckStatesProps) => {
@@ -21,56 +21,56 @@ const CheckStates = ({ goNoGoPolls }: CheckStatesProps) => {
     <Group title="Checklist" className="flex flex-col gap-2.5">
       <StateControl
         label="Propulsion"
-        value={goNoGoPolls?.states.propulsion}
+        value={goNoGoPolls?.states?.propulsion ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { propulsion: value } } })
         }
       />
       <StateControl
         label="Recovery"
-        value={goNoGoPolls?.states.recovery}
+        value={goNoGoPolls?.states?.recovery ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { recovery: value } } })
         }
       />
       <StateControl
         label="Range"
-        value={goNoGoPolls?.states.range}
+        value={goNoGoPolls?.states?.range ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { range: value } } })
         }
       />
       <StateControl
         label="Pad"
-        value={goNoGoPolls?.states.pad}
+        value={goNoGoPolls?.states?.pad ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { pad: value } } })
         }
       />
       <StateControl
         label="Telemetry"
-        value={goNoGoPolls?.states.telemetry}
+        value={goNoGoPolls?.states?.telemetry ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { telemetry: value } } })
         }
       />
       <StateControl
         label="Trajectory"
-        value={goNoGoPolls?.states.trajectory}
+        value={goNoGoPolls?.states?.trajectory ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { trajectory: value } } })
         }
       />
       <StateControl
         label="Pyro"
-        value={goNoGoPolls?.states.pyro}
+        value={goNoGoPolls?.states?.pyro ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { pyro: value } } })
         }
       />
       <StateControl
         label="Operations"
-        value={goNoGoPolls?.states.operations}
+        value={goNoGoPolls?.states?.operations ?? "tbd"}
         onChange={(value) =>
           mutateAsync({ goNoGoPolls: { states: { operations: value } } })
         }

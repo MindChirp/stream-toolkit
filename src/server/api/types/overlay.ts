@@ -19,7 +19,7 @@ export type ClockStateData = {
 };
 export type OverlayStateData = {
   state: State;
-  goNoGoPolls?: {
+  goNoGoPolls: {
     show: boolean;
     states: {
       propulsion: PollState;
@@ -32,20 +32,19 @@ export type OverlayStateData = {
       operations: PollState;
     };
   };
-  signOfLife?: { show: boolean };
-  message?: {
+  signOfLife: { show: boolean };
+  message: {
     show: boolean;
     message?: string | null;
+  };
+  sponsor: {
+    show: boolean;
+    sponsorIndex: number;
   };
 };
 
 export class Overlay {
-  #state: {
-    state: State;
-    goNoGoPolls: NonNullable<OverlayStateData["goNoGoPolls"]>;
-    message: NonNullable<OverlayStateData["message"]>;
-    signOfLife: NonNullable<OverlayStateData["signOfLife"]>;
-  } = {
+  #state: OverlayStateData = {
     state: "early-countdown",
     signOfLife: { show: true },
     goNoGoPolls: {
@@ -64,6 +63,10 @@ export class Overlay {
     message: {
       show: false,
       message: undefined,
+    },
+    sponsor: {
+      show: false,
+      sponsorIndex: 0,
     },
   };
 
@@ -117,8 +120,15 @@ export class Overlay {
     console.log("SIGNOFLIFE ", state);
     this.#state.signOfLife.show = state.show;
   }
-  getSignOfLifeState() {
-    return this.#state.signOfLife;
+
+  setSponsorState(state: Partial<OverlayStateData["sponsor"]>) {
+    if (state.show !== undefined) {
+      this.#state.sponsor.show = state.show;
+    }
+
+    if (state.sponsorIndex !== undefined) {
+      this.#state.sponsor.sponsorIndex = state.sponsorIndex;
+    }
   }
 
   patchTelemetry(
