@@ -14,7 +14,7 @@ const Group = ({
   return (
     <div
       className={cn(
-        `border-border relative rounded-xl border-3 p-5`,
+        `border-border relative rounded-xl border-3 p-5 pt-10`,
         { "border-red-400": variant === "danger" },
         className,
       )}

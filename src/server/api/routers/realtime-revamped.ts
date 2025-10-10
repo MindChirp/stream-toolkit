@@ -1,26 +1,32 @@
-import { ServerEventHandlerRetrofit } from "@/lib/telemetry/telemetry-client-retrofit";
-import EventEmitter, { on } from "events";
+import { on } from "events";
 import z from "zod";
+import {
+  ee,
+  overlay as OverlayInstance,
+  serverListener as ServerListener,
+} from "../singleton";
+
+import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import {
   ClockState,
-  Overlay,
   State,
   type ClockStateData,
   type OverlayStateData,
-  type TelemetryStateData,
 } from "../types/overlay";
+
+const PollStates = ["go", "nogo", "tbd"] as const;
 
 /**
  * Used for coordinating events, such as when a piece of telemetry is received from the telemetry backend,
  * and it must be broadcast to the stream overlay UI listener.
  */
-const ee = new EventEmitter();
 const OUTGOING_DATA_CHANNELS = {
   TELEMETRY: "telemetry",
   OVERLAY_STATE: "overlay-state",
   CLOCK_STATE: "clock-state",
 };
+
 export const UI_DATASOURCE_TARGETS = [
   "altitude",
   "velocity",
@@ -30,23 +36,30 @@ export const UI_DATASOURCE_TARGETS = [
   "accelleration",
   "lat",
   "lon",
+  "fc_active",
+  "ecu_active",
+  "fc_state",
+  "ecu_state",
 ] as const;
 
 /**
  * Used for managing the overlay state
  */
-const OverlayInstance = new Overlay();
-OverlayInstance.clock.timeTickCallback((time) => {
-  ee.emit(OUTGOING_DATA_CHANNELS.CLOCK_STATE, {
-    time,
-    state: OverlayInstance.clock.getState(),
-  } as ClockStateData);
-});
+if (!("__clockHooked" in globalThis)) {
+  OverlayInstance.clock.timeTickCallback((time) => {
+    ee.emit(OUTGOING_DATA_CHANNELS.CLOCK_STATE, {
+      time,
+      state: OverlayInstance.clock.getState(),
+    } as ClockStateData);
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  (globalThis as any).__clockHooked = true;
+}
 
 /**
  * Used for listening to UDP/SSE data streaming in from the telemetry backend.
  */
-const ServerListener = new ServerEventHandlerRetrofit();
 
 /**
  * The realtime tRPC router responsible for handling realtime communications.
@@ -64,7 +77,10 @@ export const realtimeRouterRevamped = createTRPCRouter({
     for await (const [data] of on(ee, OUTGOING_DATA_CHANNELS.TELEMETRY, {
       signal: opts.signal,
     })) {
-      const item = data as TelemetryStateData;
+      const item = data as Record<
+        (typeof UI_DATASOURCE_TARGETS)[number],
+        unknown
+      >;
       yield item;
     }
   }),
@@ -86,9 +102,9 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
   onOverlayState: publicProcedure.subscription(async function* (opts) {
     // Yield an initial overlay state.
-    // yield {
-    //   state: OverlayInstance.state,
-    // } as OverlayStateData;
+    yield {
+      ...OverlayInstance.getState(),
+    } as OverlayStateData;
 
     for await (const [data] of on(ee, OUTGOING_DATA_CHANNELS.OVERLAY_STATE, {
       signal: opts.signal,
@@ -109,7 +125,35 @@ export const realtimeRouterRevamped = createTRPCRouter({
     .input(
       z.object(
         {
-          state: z.enum(State),
+          state: z.enum(State).optional(),
+          goNoGoPolls: z
+            .object({
+              show: z.boolean().optional(),
+              states: z.object({
+                propulsion: z.enum(PollStates).optional(),
+                recovery: z.enum(PollStates).optional(),
+                range: z.enum(PollStates).optional(),
+                pad: z.enum(PollStates).optional(),
+                telemetry: z.enum(PollStates).optional(),
+                trajectory: z.enum(PollStates).optional(),
+                pyro: z.enum(PollStates).optional(),
+                operations: z.enum(PollStates).optional(),
+              }),
+            })
+            .optional(),
+          message: z
+            .object({
+              show: z.boolean().optional(),
+              message: z.string().optional().nullable(),
+            })
+            .optional(),
+          signOfLife: z.object({ show: z.boolean() }).optional(),
+          sponsor: z
+            .object({
+              show: z.boolean().optional(),
+              sponsorIndex: z.number().optional(),
+            })
+            .optional(),
         },
         {
           description: `Sets the overlay state. The state sent to this endpoint will immideately be reflected in the stream overlay UI.`,
@@ -117,11 +161,40 @@ export const realtimeRouterRevamped = createTRPCRouter({
       ),
     )
     .mutation(({ input }) => {
-      OverlayInstance.state = input.state;
+      if (input.state) {
+        OverlayInstance.setOverlayState(input.state);
+      }
+
+      if (input.goNoGoPolls) {
+        OverlayInstance.setGoNoGoPollState(input.goNoGoPolls);
+      }
+
+      if (input.message) {
+        OverlayInstance.setMessageState(input.message);
+      }
+
+      if (input.signOfLife) {
+        OverlayInstance.setSignOfLifeState(input.signOfLife);
+      }
+
+      if (input.sponsor) {
+        // Hide all other UI elements!
+        if (input.sponsor.show === true) {
+          OverlayInstance.setGoNoGoPollState({ show: false, states: {} }); // Hides go/nogo poll
+          OverlayInstance.setOverlayState("post-flight"); // Hides timers and telemetry
+          OverlayInstance.setSignOfLifeState({ show: false });
+        }
+
+        OverlayInstance.setSponsorState(input.sponsor);
+      }
 
       // Emit event to listeners
       ee.emit(OUTGOING_DATA_CHANNELS.OVERLAY_STATE, {
-        state: input.state,
+        state: OverlayInstance.getState().state,
+        goNoGoPolls: OverlayInstance.getState().goNoGoPolls,
+        message: OverlayInstance.getState().message,
+        signOfLife: OverlayInstance.getState().signOfLife,
+        sponsor: OverlayInstance.getState().sponsor,
       } satisfies OverlayStateData);
     }),
 
@@ -193,25 +266,36 @@ export const realtimeRouterRevamped = createTRPCRouter({
                telemetry information.`,
           },
         ),
+        signOfLife: z.enum(["ecu", "fc"]).optional(),
       }),
     )
-    .mutation(({ input }) => {
+    .mutation(async ({ input }) => {
       // Create a telemetry source
 
-      const socket = ServerListener.addSource(
-        input.host,
-        input.port,
-        input.telemetryUIMap.map((i) => ({
-          from: i.rawName,
-          uiTarget: i.uiTarget,
-        })),
-      );
+      try {
+        const socket = await ServerListener.addSource(
+          input.host,
+          input.port,
+          input.telemetryUIMap.map((i) => ({
+            from: i.rawName,
+            uiTarget: i.uiTarget,
+          })),
+          input.signOfLife,
+        );
 
-      socket.socket.on("message", (msg) => {
-        const data = socket.decode(msg);
-        // console.log("Received telemetry data:", data);
-        ee.emit("telemetry", data);
-      });
+        socket.onMessage((data) => {
+          // Update the telemetry object within the overlay
+          OverlayInstance.patchTelemetry(data.uiMappedTelemetry);
+
+          ee.emit("telemetry", OverlayInstance.getTelemetry());
+        });
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          cause: "Something went wrong while setting up socket",
+          message: JSON.stringify(e),
+        });
+      }
 
       return;
     }),

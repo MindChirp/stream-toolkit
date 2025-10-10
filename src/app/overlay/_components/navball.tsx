@@ -141,7 +141,7 @@ const Navball = ({ pitch, yaw, roll, className, ...props }: NavballProps) => {
         <AxisRing rotation={[Math.PI / 2, 0, 0]} />
         <OrbitControls />
 
-        <Rocket1 pitch={(pitch ?? 0) - 90} yaw={yaw} roll={roll} />
+        <Rocket1 pitch={(pitch ?? 0) - 180} yaw={yaw} roll={roll} />
       </Canvas>
     </div>
   );

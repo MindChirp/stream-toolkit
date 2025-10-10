@@ -45,6 +45,9 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
     resolver: zodResolver(sourceUIMapFormSchema),
     defaultValues: {
       host: "",
+      port: 0o0,
+      signOfLife: "none",
+      telemetryUIMap: [],
     },
   });
 
@@ -98,7 +101,6 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                     onChange={(e) => {
                       field.onChange(parseInt(e.currentTarget.value));
                     }}
-                    placeholder="1234"
                   />
                 </FormControl>
                 <FormMessage />
@@ -106,6 +108,33 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
             )}
           />
         </div>
+
+        <FormField
+          control={sourceForm.control}
+          name="signOfLife"
+          render={({ field }) => (
+            <FormItem className="mt-5">
+              <FormLabel>Sign of life</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="ecu">ECU Active</SelectItem>
+                      <SelectItem value="fc">FC Active</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         {sourceForm.formState.touchedFields.host && (
           <motion.div
@@ -158,6 +187,15 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                   <SelectItem value="heimdallP6005">
                     Heimdall Port 6005
                   </SelectItem>
+                  <SelectItem value="heimdallP6004">
+                    Heimdall Port 6004
+                  </SelectItem>
+                  <SelectItem value="heimdallP6002">
+                    Heimdall Port 6002
+                  </SelectItem>
+                  <SelectItem value="heimdallP9994">
+                    Heimdall Port 9994
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -205,7 +243,6 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                       onValueChange={(
                         value: (typeof UI_DATASOURCE_TARGETS)[0],
                       ) => {
-                        console.log(value);
                         sourceForm.setValue(
                           `telemetryUIMap.${index}.uiTarget`,
                           value,
@@ -227,12 +264,20 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
                           </SelectItem>
                           <SelectItem value="lat">Latitude</SelectItem>
                           <SelectItem value="lon">Longitude</SelectItem>
+                          <SelectItem value="fc_active">FC Active</SelectItem>
+                          <SelectItem value="fc_state">FC State</SelectItem>
+                          <SelectItem value="ecu_active">ECU Active</SelectItem>
+                          <SelectItem value="ecu_state">ECU State</SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
 
                     <Button
-                      onClick={() => remove(index)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        remove(index);
+                      }}
+                      type="button"
                       variant={"outline"}
                       className="col-start-3 row-start-2 w-fit"
                     >
@@ -245,7 +290,11 @@ const SourceUIMapForm = ({ onSubmit }: SourceUIMapFormProps) => {
             <Button
               className="w-fit"
               variant="secondary"
-              onClick={() => append({ rawName: "", uiTarget: "yaw" })}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                append({ rawName: "", uiTarget: "yaw" });
+              }}
             >
               <PlusIcon />
               Add mapping

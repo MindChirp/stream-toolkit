@@ -5,6 +5,7 @@ export const UIMappingsRocketPresets: Record<
   string,
   z.infer<typeof sourceUIMapFormSchema>["telemetryUIMap"]
 > = {
+  heimdallP9994: [{ rawName: "fsm_state", uiTarget: "ecu_state" }],
   heimdallP6005: [
     {
       rawName: "kalman_altitude",
@@ -20,7 +21,7 @@ export const UIMappingsRocketPresets: Record<
     },
     {
       rawName: "kalman_yaw",
-      uiTarget: "roll",
+      uiTarget: "yaw",
     },
     {
       rawName: "kalman_pitch",
@@ -28,9 +29,20 @@ export const UIMappingsRocketPresets: Record<
     },
     {
       rawName: "kalman_roll",
-      uiTarget: "yaw",
+      uiTarget: "roll",
     },
   ],
+  heimdallP6004: [
+    {
+      rawName: "neo_longitude",
+      uiTarget: "lon",
+    },
+    {
+      rawName: "neo_latitude",
+      uiTarget: "lat",
+    },
+  ],
+  heimdallP6002: [{ rawName: "fsm_state", uiTarget: "fc_state" }],
   bifrostP8080: [
     {
       rawName: "kalman_velocity",
@@ -46,9 +58,9 @@ export const UIMappingsRocketPresets: Record<
     },
     {
       rawName: "yaw",
-      uiTarget: "yaw",
+      uiTarget: "roll",
     },
-    { rawName: "roll", uiTarget: "roll" },
+    { rawName: "roll", uiTarget: "yaw" },
     {
       rawName: "acc_z_moving_average",
       uiTarget: "accelleration",

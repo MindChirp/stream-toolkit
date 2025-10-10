@@ -9,6 +9,13 @@ import SourceUIMapForm from "./forms/source-ui-map-form/source-ui-map-form";
 import TelemetryRow from "./telemetry-row";
 import { toast } from "sonner";
 import type { TRPCError } from "@trpc/server";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import AutoTelemetrySetup from "./auto-telemetry-setup";
 
 const TelemetrySource = () => {
   const { mutateAsync } = api.socket.setupTelemetrySource.useMutation();
@@ -20,7 +27,10 @@ const TelemetrySource = () => {
 
   const handleSourceSubmit = (data: z.infer<typeof sourceUIMapFormSchema>) => {
     // Get host and port from ip address
-    return mutateAsync(data)
+    return mutateAsync({
+      ...data,
+      signOfLife: data.signOfLife !== "none" ? data.signOfLife : undefined,
+    })
       .then(() => {
         void utils.socket.invalidate();
       })
@@ -30,7 +40,15 @@ const TelemetrySource = () => {
   };
   return (
     <div className="flex w-full flex-col">
-      <SourceUIMapForm onSubmit={handleSourceSubmit} />
+      <AutoTelemetrySetup />
+      <Accordion type="single" collapsible className="mt-5">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Advanced setup</AccordionTrigger>
+          <AccordionContent>
+            <SourceUIMapForm onSubmit={handleSourceSubmit} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       <AnimatePresence>
         {!!sources?.length && (
           <motion.div
@@ -42,7 +60,7 @@ const TelemetrySource = () => {
             }}
             exit={{ height: 0, opacity: 0, overflow: "hidden" }}
           >
-            <h2 className="mt-5">Sources</h2>
+            <h2 className="">Sources</h2>
             <Separator className="mb-2.5" />
             <div className="flex flex-row flex-wrap gap-2.5">
               {sources?.map((s) => (
@@ -52,7 +70,9 @@ const TelemetrySource = () => {
                       host: s.host,
                       port: s.port,
                     })
-                      .then(() => utils.socket.getTelemetrySources.invalidate())
+                      .then(() => {
+                        void utils.socket.getTelemetrySources.invalidate();
+                      })
                       .catch((e: TRPCError) => toast.error(e.message));
                   }}
                   name={s.host + ":" + s.port}

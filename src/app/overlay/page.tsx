@@ -1,43 +1,162 @@
 "use client";
 
-import { useTelemetry } from "@/lib/hooks/useTelemetry";
 import { api } from "@/trpc/react";
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import Image from "next/image";
 import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
+import ComputerStates from "./_components/computer-states";
+import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
-import StateTimeline from "./_components/state-timeline";
+import { Badge } from "@/components/ui/badge";
+import { SPONSORS } from "@/lib/telemetry/constants/sponsors";
+import { cn } from "@/lib/utils";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
-  const telemetry = useTelemetry();
+  // Something wrong in this file
+  // const state = {};
+  const { data: telemetry } = api.socket.onTelemetry.useSubscription();
   const { data: state } = api.socket.onOverlayState.useSubscription();
   const { data: time } = api.socket.onClock.useSubscription();
 
   return (
-    <div className="flex h-screen max-h-screen w-full overflow-hidden">
+    <div className="relative flex h-screen max-h-screen w-full overflow-hidden">
       <AnimatePresence>
-        {state?.state && state?.state !== "post-flight" && (
-          <StateTimeline key="state-timeline" state={state.state} />
-        )}
         {/* {(state?.state === "early-countdown" ||
           state?.state === "final-countdown") && (
           <SponsorReel key="sponsor-reel" className="absolute top-52 right-0" />
         )} */}
+        <div
+          className="absolute top-1/4 left-1/2 hidden flex-col gap-2.5 text-lg"
+          key="overlay-debug"
+        >
+          <h1 className="flex flex-row items-center justify-between gap-5">
+            FC State
+            <Badge className="text-2xl">
+              {JSON.stringify(telemetry?.fc_state)}
+            </Badge>
+          </h1>
+
+          <h1 className="flex flex-row items-center justify-between gap-5">
+            ECU State
+            <Badge className="text-2xl">
+              {JSON.stringify(telemetry?.ecu_state)}
+            </Badge>
+          </h1>
+        </div>
+
+        {state?.sponsor.show && state.sponsor.sponsorIndex !== undefined && (
+          <motion.div
+            initial={{
+              x: "100%",
+            }}
+            animate={{
+              x: 0,
+            }}
+            exit={{
+              x: "100%",
+              transition: {
+                duration: 1,
+                ease: "easeInOut",
+                // Smooth and professional transition
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+              },
+            }}
+            // Smooth and professional transition
+            transition={{
+              duration: 1,
+              ease: "easeInOut",
+              // Smooth and professional transition
+              type: "spring",
+              stiffness: 100,
+              damping: 20,
+              delay: 2,
+            }}
+            className={cn(
+              "absolute top-1/2 right-0 -translate-y-1/2 rounded-l-xl rounded-bl-3xl px-10 py-5",
+              SPONSORS[state?.sponsor.sponsorIndex]?.bg === "black"
+                ? "bg-black/70"
+                : "bg-white/70",
+            )}
+          >
+            <Image
+              src={`/images/sponsors/${SPONSORS[state.sponsor.sponsorIndex]?.source}`}
+              alt="Sponsor"
+              className="h-fit w-96 object-cover"
+              width={1000}
+              height={1000}
+            />
+          </motion.div>
+        )}
 
         {state?.state === "early-countdown" && (
           <SmallCountdown
+            className="top-[19rem]"
+            key="small-countdown"
             time={time?.time.slice(2, 8) ?? "TBD"}
             preLaunch={time?.time.slice(0, 2) === "T-" ? true : false}
           />
         )}
 
+        {state?.goNoGoPolls?.show && (
+          <GoNoGoPolls state={state.goNoGoPolls.states} key="go-no-go-polls" />
+        )}
+
+        {state?.signOfLife?.show && (
+          <ComputerStates
+            key="computer-states"
+            className="top-[24rem]"
+            ecu={Boolean(telemetry?.ecu_active)}
+            fc={Boolean(telemetry?.fc_active)}
+          />
+        )}
+
+        {/* <ComputerStates
+          key="computer-states"
+          className="top-[24rem] right-full left-0"
+        /> */}
+
+        {state?.state == "early-countdown" && (
+          <motion.div
+            className="absolute top-[8rem] right-5 z-20 h-32 w-fit"
+            key="propulse-logo"
+            initial={{
+              x: "110%",
+            }}
+            animate={{
+              x: 0,
+            }}
+            exit={{
+              x: "110%",
+              transition: {
+                duration: 0.5,
+                delay: 0.5,
+                ease: "easeIn",
+              },
+            }}
+            transition={{ duration: 1, ease: "circOut", delay: 0.5 }}
+          >
+            <Image
+              src="/images/logo-white.png"
+              width={1000}
+              height={1000}
+              className="h-full w-full object-cover"
+              alt="Mor di"
+            />
+          </motion.div>
+        )}
         {state?.state &&
           state?.state !== "post-flight" &&
           state?.state !== "early-countdown" && (
             <BottomTelemetry
+              message={state.message}
               gForce={
                 parseFloat((telemetry?.accelleration as string) ?? 0) / 9.81
               }
+              ecuFsmState={telemetry?.ecu_state as number}
+              fcFsmState={telemetry?.fc_state as number}
               position={{
                 lat: telemetry?.lat as number,
                 lon: telemetry?.lon as number,

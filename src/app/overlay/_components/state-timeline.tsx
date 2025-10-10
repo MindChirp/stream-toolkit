@@ -1,42 +1,107 @@
+import { Badge } from "@/components/ui/badge";
+import { motion } from "motion/react";
+import { useTimelineIndex } from "@/lib/hooks/useTimelineIndex";
 import { cn } from "@/lib/utils";
-import type { State } from "@/types/states";
-import React from "react";
+import { Roboto_Flex } from "next/font/google";
+import { type ComponentProps } from "react";
+
+const robotoFlex = Roboto_Flex({
+  variable: "--font-azeret-mono",
+  axes: ["GRAD", "wdth", "slnt"],
+  subsets: ["latin"],
+});
 
 type StateTimelineProps = {
-  state: State;
-};
+  fc_state?: number;
+  ecu_state?: number;
+} & ComponentProps<typeof motion.div>;
 
-const StateTimeline = ({ state, ...props }: StateTimelineProps) => {
-  return undefined;
-  return (
-    <div className="absolute top-0 flex h-40 w-full flex-row items-start justify-center gap-5 bg-gradient-to-b from-black to-transparent pt-5">
-      <div className="flex h-20 flex-row items-center">
-        {["early-countdown", "final-countdown", "in-flight", "post-flight"].map(
-          (s, i) => (
-            <TimelineItem label={s} key={i} active={s === state} />
-          ),
-        )}
-      </div>
-    </div>
-  );
-};
+/**
+ * ECU <= 2
+ */
 
-const TimelineItem = ({
-  active,
-  label,
-}: {
-  active: boolean;
-  label: string;
-}) => {
+const FSM_STATES = [
+  "Safe", //ECU State
+  "Fuel Fill", // ECU State
+  "Post Fuel Fill", // ECU State
+  "All Fill", // FC State
+  "Drogue Close", // FC State
+  "Main Close", // FC State
+  "Floatation Close", // FC State
+  "N2 Fill", // ECU State
+  "Post N2", // ECU State
+  "Ox Fill", // ECU State
+  "Post Ox", // ECU State
+  "Pressurized", // ECU State
+  "Armed", // ECU State
+  "Burn", // ECU State
+  "Coast", // FC State
+  "Drogue Chute", // FC State
+  "Main Chute", // FC State
+  "Flotation", // FC State
+  "Recovery", // FC State
+];
+
+const StateTimeline = ({
+  fc_state,
+  ecu_state,
+  className,
+  ...props
+}: StateTimelineProps) => {
+  const index = useTimelineIndex({
+    fcFsmState: fc_state ?? 0,
+    ecuFsmState: ecu_state ?? 0,
+  });
+
+  const prevIndex = index !== undefined && index > 0 ? index - 1 : undefined;
+
+  const nextIndex =
+    index !== undefined && index < FSM_STATES.length ? index + 1 : undefined;
+
+  if (index == undefined) return undefined;
   return (
-    <h3
+    <motion.div
+      key="timeline"
+      initial={{
+        y: 10,
+        opacity: 0,
+      }}
+      animate={{
+        y: 0,
+        opacity: 1,
+      }}
+      exit={{
+        y: 10,
+        opacity: 0,
+      }}
       className={cn(
-        `${active ? "black rounded-lg bg-gradient-to-b from-white to-white/80 p-2.5" : "text-white/90"} transition-all`,
-        "text-2xl",
+        "absolute bottom-0 left-1/2 flex w-fit -translate-x-1/2 translate-y-full flex-row items-center justify-center text-center font-semibold whitespace-nowrap text-white",
+        className,
       )}
+      {...props}
     >
-      {label}
-    </h3>
+      {prevIndex !== undefined && (
+        <span className="absolute -left-2.5 w-fit -translate-x-full text-end whitespace-nowrap">
+          {FSM_STATES[prevIndex]}
+        </span>
+      )}
+      <Badge variant={"secondary"} className="w-fit rounded-lg">
+        <span
+          className={cn("text-2xl font-bold uppercase", robotoFlex.className)}
+          style={{
+            fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
+          }}
+        >
+          {index !== undefined && FSM_STATES[index]}
+          {index === undefined && "Unknown"}
+        </span>
+      </Badge>
+      {nextIndex !== undefined && (
+        <span className="absolute -right-2.5 w-fit translate-x-full text-end whitespace-nowrap">
+          {FSM_STATES[nextIndex]}
+        </span>
+      )}
+    </motion.div>
   );
 };
 

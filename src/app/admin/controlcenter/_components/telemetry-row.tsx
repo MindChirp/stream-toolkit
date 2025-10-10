@@ -9,10 +9,8 @@ import {
 } from "@/components/ui/card";
 import type { UiMap } from "@/lib/telemetry/telemetry-client-retrofit";
 import { cn } from "@/lib/utils";
-import { TRPCError } from "@trpc/server";
 import { Loader, Trash } from "lucide-react";
 import { useState, type ComponentProps } from "react";
-import { toast } from "sonner";
 
 type TelemetryRowProps = {
   name: string;
@@ -33,7 +31,7 @@ const TelemetryRow = ({
     void onDelete().finally(() => setDeleting(false));
   };
   return (
-    <Card className={cn("w-full", className)} {...props}>
+    <Card className={cn("w-auto min-w-52", className)} {...props}>
       <CardHeader>
         <CardTitle>{name}</CardTitle>
         <CardDescription>{mappings.length} mappings</CardDescription>
