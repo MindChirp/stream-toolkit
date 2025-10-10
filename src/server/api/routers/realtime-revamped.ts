@@ -178,6 +178,13 @@ export const realtimeRouterRevamped = createTRPCRouter({
       }
 
       if (input.sponsor) {
+        // Hide all other UI elements!
+        if (input.sponsor.show === true) {
+          OverlayInstance.setGoNoGoPollState({ show: false, states: {} }); // Hides go/nogo poll
+          OverlayInstance.setOverlayState("post-flight"); // Hides timers and telemetry
+          OverlayInstance.setSignOfLifeState({ show: false });
+        }
+
         OverlayInstance.setSponsorState(input.sponsor);
       }
 

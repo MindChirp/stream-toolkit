@@ -16,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SPONSORS } from "@/lib/telemetry/constants/sponsors";
+import { type OverlayStateData } from "@/server/api/types/overlay";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon, Loader } from "lucide-react";
@@ -23,22 +25,15 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
-const SPONSORS = [
-  { source: "fieldmade.png", name: "Fieldmade" },
-  { source: "gkn.png", name: "GKN Aerospace" },
-  { source: "nammo.png", name: "Nammo" },
-  { source: "norwegian_royal_airforce.svg", name: "Norwegian Royal Airforce" },
-  { source: "ntnu.png", name: "NTNU" },
-  { source: "radionor.png", name: "Radionor" },
-  { source: "sparebank1.svg", name: "Sparebank 1" },
-];
-
 const formSchema = z.object({
   sponsorIndex: z.number().optional(),
 });
 
-const SponsorControls = () => {
-  const { data: state } = api.socket.onOverlayState.useSubscription();
+const SponsorControls = ({
+  state,
+}: {
+  state?: OverlayStateData["sponsor"];
+}) => {
   const { mutateAsync, status } = api.socket.setOverlayState.useMutation();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: { sponsorIndex: undefined },
@@ -109,7 +104,7 @@ const SponsorControls = () => {
           </div>
         </form>
       </Form>
-      {state?.sponsor?.show && state?.sponsor?.sponsorIndex !== undefined && (
+      {state?.show && state?.sponsorIndex !== undefined && (
         <div className="mt-5 flex flex-col gap-2.5">
           <span>Currently displaying</span>
           <Image
@@ -117,7 +112,7 @@ const SponsorControls = () => {
             width={1000}
             height={1000}
             alt="Sponsor"
-            src={`/images/sponsors/${SPONSORS[state?.sponsor.sponsorIndex]?.source}`}
+            src={`/images/sponsors/${SPONSORS[state?.sponsorIndex]?.source}`}
           />
           <Button variant="destructive" className="w-fit" onClick={handleHide}>
             <EyeOffIcon /> Hide

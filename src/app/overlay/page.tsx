@@ -8,6 +8,8 @@ import ComputerStates from "./_components/computer-states";
 import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
 import { Badge } from "@/components/ui/badge";
+import { SPONSORS } from "@/lib/telemetry/constants/sponsors";
+import { cn } from "@/lib/utils";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
@@ -43,6 +45,52 @@ const OverlayPage = () => {
           </h1>
         </div>
 
+        {state?.sponsor.show && state.sponsor.sponsorIndex !== undefined && (
+          <motion.div
+            initial={{
+              x: "100%",
+            }}
+            animate={{
+              x: 0,
+            }}
+            exit={{
+              x: "100%",
+              transition: {
+                duration: 1,
+                ease: "easeInOut",
+                // Smooth and professional transition
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+              },
+            }}
+            // Smooth and professional transition
+            transition={{
+              duration: 1,
+              ease: "easeInOut",
+              // Smooth and professional transition
+              type: "spring",
+              stiffness: 100,
+              damping: 20,
+              delay: 2,
+            }}
+            className={cn(
+              "absolute top-1/2 right-0 -translate-y-1/2 rounded-l-xl rounded-bl-3xl px-10 py-5",
+              SPONSORS[state?.sponsor.sponsorIndex]?.bg === "black"
+                ? "bg-black/70"
+                : "bg-white/70",
+            )}
+          >
+            <Image
+              src={`/images/sponsors/${SPONSORS[state.sponsor.sponsorIndex]?.source}`}
+              alt="Sponsor"
+              className="h-fit w-96 object-cover"
+              width={1000}
+              height={1000}
+            />
+          </motion.div>
+        )}
+
         {state?.state === "early-countdown" && (
           <SmallCountdown
             className="top-[19rem]"
@@ -75,13 +123,13 @@ const OverlayPage = () => {
             className="absolute top-[8rem] right-5 z-20 h-32 w-fit"
             key="propulse-logo"
             initial={{
-              x: "100%",
+              x: "110%",
             }}
             animate={{
               x: 0,
             }}
             exit={{
-              x: "100%",
+              x: "110%",
               transition: {
                 duration: 0.5,
                 delay: 0.5,

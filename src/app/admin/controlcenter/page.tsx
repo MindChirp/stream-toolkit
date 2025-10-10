@@ -29,7 +29,7 @@ const ControlCenter = () => {
           <TelemetrySource />
         </Group>
         <MessageControls />
-        <SponsorControls />
+        <SponsorControls state={states?.sponsor} />
         {/* <Group
           title="Danger Area"
           variant="danger"
