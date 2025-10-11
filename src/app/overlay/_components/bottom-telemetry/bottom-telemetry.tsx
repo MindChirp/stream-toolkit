@@ -14,6 +14,7 @@ import Gauge from "../gauge";
 import MapGauge from "../map-gauge";
 import Navball from "../navball";
 import StateTimeline from "../state-timeline";
+import KSPNavball from "../ksp-navball";
 
 type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
   timestamp?: string;
@@ -40,6 +41,7 @@ type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
   };
   fcFsmState?: number;
   ecuFsmState?: number;
+  kspNavball?: boolean;
 };
 
 const azeretMono = Azeret_Mono({
@@ -65,6 +67,7 @@ const BottomTelemetry = ({
   position,
   fcFsmState,
   ecuFsmState,
+  kspNavball,
   ...props
 }: BottomTelemetryProps) => {
   return (
@@ -129,11 +132,20 @@ const BottomTelemetry = ({
                     delay: 2.15,
                   }}
                 >
-                  <Navball
-                    pitch={orientation?.pitch}
-                    yaw={orientation?.yaw}
-                    roll={orientation?.roll}
-                  />
+                  {!kspNavball && (
+                    <Navball
+                      pitch={orientation?.pitch}
+                      yaw={orientation?.yaw}
+                      roll={orientation?.roll}
+                    />
+                  )}
+                  {kspNavball && (
+                    <KSPNavball
+                      pitch={orientation?.pitch}
+                      roll={orientation?.roll}
+                      yaw={orientation?.yaw}
+                    />
+                  )}
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 2.3 }}>
                   <MapGauge

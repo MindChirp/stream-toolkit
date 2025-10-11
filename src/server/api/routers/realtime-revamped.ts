@@ -154,6 +154,7 @@ export const realtimeRouterRevamped = createTRPCRouter({
               sponsorIndex: z.number().optional(),
             })
             .optional(),
+          kspNavball: z.object({ show: z.boolean() }).optional(),
         },
         {
           description: `Sets the overlay state. The state sent to this endpoint will immideately be reflected in the stream overlay UI.`,
@@ -175,6 +176,10 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
       if (input.signOfLife) {
         OverlayInstance.setSignOfLifeState(input.signOfLife);
+      }
+      if (input.kspNavball) {
+        console.log("SETTING KSP NAVBALL STATE");
+        OverlayInstance.setKSPNavballState(input.kspNavball);
       }
 
       if (input.sponsor) {
@@ -203,6 +208,7 @@ export const realtimeRouterRevamped = createTRPCRouter({
         message: OverlayInstance.getState().message,
         signOfLife: OverlayInstance.getState().signOfLife,
         sponsor: OverlayInstance.getState().sponsor,
+        kspNavball: OverlayInstance.getState().kspNavball,
       } satisfies OverlayStateData);
     }),
 

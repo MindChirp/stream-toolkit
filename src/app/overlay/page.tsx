@@ -249,6 +249,7 @@ const OverlayPage = () => {
                 state: time?.state ?? "hold",
               }}
               overlayState={state.state}
+              kspNavball={state.kspNavball.show}
               key="bottom-telemetry"
               className="absolute right-0 bottom-0 left-0"
             />
