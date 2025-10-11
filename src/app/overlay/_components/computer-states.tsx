@@ -32,13 +32,9 @@ const ComputerStates = ({ ecu, fc, className }: ComputerStatesProps) => {
         },
       }}
       transition={{ duration: 1, ease: "circOut" }}
-      className={cn(
-        "absolute top-60 right-0 z-20",
-        robotoFlex.className,
-        className,
-      )}
+      className={cn("z-20 w-fit", robotoFlex.className, className)}
     >
-      <div className="flex flex-col rounded-tl-lg rounded-bl-3xl bg-black/70 px-16 py-2 leading-none font-semibold text-white">
+      <div className="flex flex-col rounded-tl-lg rounded-bl-3xl bg-black/90 px-16 py-2 leading-none font-semibold text-white">
         <span className="flex flex-row items-center justify-between gap-2.5 text-2xl">
           ECU <IndicatorCircle active={ecu} />
         </span>

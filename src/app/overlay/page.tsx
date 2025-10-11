@@ -1,5 +1,7 @@
 "use client";
 
+import { SPONSORS } from "@/lib/telemetry/constants/sponsors";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
@@ -7,9 +9,6 @@ import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
 import ComputerStates from "./_components/computer-states";
 import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
-import { Badge } from "@/components/ui/badge";
-import { SPONSORS } from "@/lib/telemetry/constants/sponsors";
-import { cn } from "@/lib/utils";
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
@@ -21,13 +20,12 @@ const OverlayPage = () => {
 
   return (
     <div className="relative flex h-screen max-h-screen w-full overflow-hidden">
-      <AnimatePresence>
-        {/* {(state?.state === "early-countdown" ||
+      {/* {(state?.state === "early-countdown" ||
           state?.state === "final-countdown") && (
           <SponsorReel key="sponsor-reel" className="absolute top-52 right-0" />
         )} */}
-        <div
-          className="absolute top-1/4 left-1/2 hidden flex-col gap-2.5 text-lg"
+      {/* <div
+          className="absolute top-1/4 left-1/2 flex-col gap-2.5 text-lg"
           key="overlay-debug"
         >
           <h1 className="flex flex-row items-center justify-between gap-5">
@@ -43,8 +41,9 @@ const OverlayPage = () => {
               {JSON.stringify(telemetry?.ecu_state)}
             </Badge>
           </h1>
-        </div>
+        </div> */}
 
+      <AnimatePresence>
         {state?.sponsor.show && state.sponsor.sponsorIndex !== undefined && (
           <motion.div
             initial={{
@@ -58,17 +57,14 @@ const OverlayPage = () => {
               transition: {
                 duration: 1,
                 ease: "easeInOut",
-                // Smooth and professional transition
                 type: "spring",
                 stiffness: 100,
                 damping: 20,
               },
             }}
-            // Smooth and professional transition
             transition={{
               duration: 1,
               ease: "easeInOut",
-              // Smooth and professional transition
               type: "spring",
               stiffness: 100,
               damping: 20,
@@ -90,35 +86,114 @@ const OverlayPage = () => {
             />
           </motion.div>
         )}
+      </AnimatePresence>
 
-        {state?.state === "early-countdown" && (
-          <SmallCountdown
-            className="top-[19rem]"
-            key="small-countdown"
-            time={time?.time.slice(2, 8) ?? "TBD"}
-            preLaunch={time?.time.slice(0, 2) === "T-" ? true : false}
-          />
-        )}
-
-        {state?.goNoGoPolls?.show && (
-          <GoNoGoPolls state={state.goNoGoPolls.states} key="go-no-go-polls" />
-        )}
-
-        {state?.signOfLife?.show && (
-          <ComputerStates
-            key="computer-states"
-            className="top-[24rem]"
-            ecu={Boolean(telemetry?.ecu_active)}
-            fc={Boolean(telemetry?.fc_active)}
-          />
-        )}
-
-        {/* <ComputerStates
+      {/* <ComputerStates
           key="computer-states"
           className="top-[24rem] right-full left-0"
         /> */}
 
-        {state?.state == "early-countdown" && (
+      <div
+        className="absolute top-[8rem] right-0 flex w-fit flex-col items-end"
+        key="right-side-overlay"
+      >
+        <div className="h-32">
+          <AnimatePresence>
+            {state?.state == "early-countdown" && (
+              <motion.div
+                className="relative z-20 h-32 w-fit"
+                key="propulse-logo"
+                initial={{
+                  x: "110%",
+                }}
+                animate={{
+                  x: -10,
+                }}
+                exit={{
+                  x: "110%",
+                  transition: {
+                    duration: 0.5,
+                    delay: 0.5,
+                    ease: "easeInOut",
+                  },
+                }}
+                transition={{ duration: 1, ease: "circOut", delay: 0.5 }}
+              >
+                <Image
+                  src="/images/logo-white.png"
+                  width={1000}
+                  height={1000}
+                  className="h-32 w-full object-cover"
+                  alt="Mor di"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="mt-5 h-12">
+          <AnimatePresence>
+            {state?.state === "early-countdown" && (
+              <SmallCountdown
+                key="small-countdown"
+                time={time?.time.slice(2, 8) ?? "TBD"}
+                preLaunch={time?.time.slice(0, 2) === "T-" ? true : false}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+        <div className="mt-5 h-20" key="signoflife-container">
+          <AnimatePresence>
+            {state?.signOfLife?.show && (
+              <ComputerStates
+                key="computer-states"
+                className="relative z-20 h-fit"
+                ecu={Boolean(telemetry?.ecu_active)}
+                fc={Boolean(telemetry?.fc_active)}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+        <div key="checklist-wrapper" className="mt-5 h-[21rem]">
+          <AnimatePresence>
+            {state?.goNoGoPolls?.show && (
+              <GoNoGoPolls
+                state={state.goNoGoPolls.states}
+                key="go-no-go-polls"
+                className="relative z-20 h-fit"
+              />
+            )}
+          </AnimatePresence>
+        </div>
+        <AnimatePresence>
+          {state?.message.show &&
+            (state?.state === "early-countdown" ||
+              state?.state == "post-flight") && (
+              <motion.div
+                key="overlay-message"
+                initial={{
+                  x: "100%",
+                }}
+                animate={{
+                  x: 0,
+                }}
+                exit={{
+                  x: "100%",
+                  transition: {
+                    duration: 0.5,
+                    delay: 0.1,
+                    ease: "easeIn",
+                  },
+                }}
+                transition={{ duration: 1, ease: "circOut", delay: 1 }}
+                className="lg mt-5 max-w-96 rounded-tl-lg rounded-bl-3xl bg-black/90 px-10 py-5 text-wrap text-white"
+              >
+                <span className="text-lg">{state.message.message}</span>
+              </motion.div>
+            )}
+        </AnimatePresence>
+      </div>
+
+      {/* {state?.state == "early-countdown" && (
           <motion.div
             className="absolute top-[8rem] right-5 z-20 h-32 w-fit"
             key="propulse-logo"
@@ -146,7 +221,8 @@ const OverlayPage = () => {
               alt="Mor di"
             />
           </motion.div>
-        )}
+        )} */}
+      <AnimatePresence>
         {state?.state &&
           state?.state !== "post-flight" &&
           state?.state !== "early-countdown" && (

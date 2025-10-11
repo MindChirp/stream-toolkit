@@ -179,10 +179,18 @@ export const realtimeRouterRevamped = createTRPCRouter({
 
       if (input.sponsor) {
         // Hide all other UI elements!
-        if (input.sponsor.show === true) {
+        if (
+          input.sponsor.show === true &&
+          !OverlayInstance.getState().sponsor.show
+        ) {
+          // Store this overlay state and restore it when the sponsor is hidden
+          OverlayInstance.createOverlayStateCheckpoint();
+
           OverlayInstance.setGoNoGoPollState({ show: false, states: {} }); // Hides go/nogo poll
           OverlayInstance.setOverlayState("post-flight"); // Hides timers and telemetry
           OverlayInstance.setSignOfLifeState({ show: false });
+        } else if (input.sponsor.show === false) {
+          OverlayInstance.restoreOverlayStateCheckpoint();
         }
 
         OverlayInstance.setSponsorState(input.sponsor);

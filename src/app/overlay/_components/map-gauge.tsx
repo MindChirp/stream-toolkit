@@ -10,7 +10,7 @@ type MapGaugeProps = {
   inert?: boolean;
 };
 
-const ZoomSteps = [13, 5, 3];
+const ZoomSteps = [13, 10, 8, 5, 3];
 
 const getNextZoomLevel = (current: number) => {
   const currentIndex = ZoomSteps.indexOf(current);
@@ -35,7 +35,7 @@ const MapGauge = ({ inert = false, zoomOverride, lat, lng }: MapGaugeProps) => {
         if (zoomOverride) return zoomOverride;
         return getNextZoomLevel(prev) ?? 13;
       });
-    }, 10000);
+    }, 7000);
 
     return () => {
       clearInterval(interval);

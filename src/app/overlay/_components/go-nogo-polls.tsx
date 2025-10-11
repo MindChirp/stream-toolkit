@@ -34,7 +34,7 @@ const GoNoGoPolls = ({ state, className, ...props }: GoNoGoPollsProps) => {
       }}
       transition={{ duration: 1, ease: "circOut" }}
       className={cn(
-        "absolute top-[30rem] right-0 z-20 flex flex-col gap-1 rounded-tl-lg rounded-bl-3xl bg-black/70 px-10 py-5",
+        "flex flex-col gap-1 rounded-tl-lg rounded-bl-3xl bg-black/90 px-10 py-5",
         className,
       )}
       {...props}
