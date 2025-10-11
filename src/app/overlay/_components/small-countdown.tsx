@@ -67,19 +67,19 @@ const SmallCountdown = ({
           transition: {
             duration: 0.5,
             delay: 0.1,
-            ease: "easeIn",
+            ease: "easeInOut",
           },
         }}
         transition={{ duration: 1, ease: "circOut" }}
         className={cn(
-          `absolute top-28 right-0 z-20 flex flex-col gap-2.5`,
+          `relative z-20 flex flex-col gap-2.5`,
           robotoFlex.className,
           className,
         )}
         {...props}
       >
         <div
-          className="rounded-tl-lg rounded-bl-3xl bg-black/70 px-14 py-2 leading-none font-semibold text-white"
+          className="rounded-tl-lg rounded-bl-3xl bg-black/90 px-14 py-2 leading-none font-semibold text-white"
           style={{
             fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
           }}

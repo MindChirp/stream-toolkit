@@ -70,6 +70,8 @@ export class Overlay {
     },
   };
 
+  stateCheckpoint: OverlayStateData | undefined = undefined;
+
   #telemetry: Record<(typeof UI_DATASOURCE_TARGETS)[number], unknown> = {
     accelleration: 0,
     altitude: 0,
@@ -142,6 +144,40 @@ export class Overlay {
       //   console.log("ECU STATE SET: ", telemetry[typedKey]);
       this.#telemetry[typedKey] = telemetry[typedKey];
     }
+  }
+
+  createOverlayStateCheckpoint() {
+    // Copy over overlay state to checkpoint property
+    this.stateCheckpoint = JSON.parse(
+      JSON.stringify(this.#state),
+    ) as OverlayStateData;
+  }
+
+  restoreOverlayStateCheckpoint() {
+    console.log("State checkpoint", this.stateCheckpoint);
+    if (this.stateCheckpoint === undefined) return;
+    this.#state = JSON.parse(
+      JSON.stringify({
+        ...this.#state,
+        goNoGoPolls: {
+          ...this.#state.goNoGoPolls,
+          show: this.stateCheckpoint.goNoGoPolls.show,
+        },
+        message: {
+          ...this.#state.message,
+          show: this.stateCheckpoint.message.show,
+        },
+        signOfLife: {
+          ...this.#state.signOfLife,
+          show: this.stateCheckpoint.signOfLife.show,
+        },
+        sponsor: {
+          ...this.#state.sponsor,
+          show: this.stateCheckpoint.sponsor.show,
+        },
+        state: this.stateCheckpoint.state,
+      }),
+    ) as OverlayStateData;
   }
 
   getTelemetry() {

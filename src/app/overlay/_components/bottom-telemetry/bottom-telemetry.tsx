@@ -7,7 +7,7 @@ import Header from "components/header";
 import SlideAnimation from "components/slide-animation";
 import { PauseIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { Azeret_Mono } from "next/font/google";
+import { Azeret_Mono, Roboto_Flex } from "next/font/google";
 import Image from "next/image";
 import { type ComponentProps } from "react";
 import Gauge from "../gauge";
@@ -44,6 +44,12 @@ type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
 
 const azeretMono = Azeret_Mono({
   variable: "--font-azeret-mono",
+  subsets: ["latin"],
+});
+
+const robotoFlex = Roboto_Flex({
+  variable: "--font-azeret-mono",
+  axes: ["GRAD", "wdth", "slnt"],
   subsets: ["latin"],
 });
 
@@ -131,10 +137,10 @@ const BottomTelemetry = ({
                 </SlideAnimation>
                 <SlideAnimation transition={{ delay: 2.3 }}>
                   <MapGauge
-                    lat={position?.lat ?? 0}
-                    lng={position?.lon ?? 0}
+                    lat={position?.lat ?? 63.786877}
+                    lng={position?.lon ?? 9.363318}
                     key="map"
-                    zoomOverride={altitude > 20 ? 15 : undefined}
+                    zoomOverride={altitude > 20 ? 12 : undefined}
                   />
                 </SlideAnimation>
               </motion.div>
@@ -184,7 +190,13 @@ const BottomTelemetry = ({
                     y: 10,
                     opacity: 0,
                   }}
-                  className="absolute -top-0 left-0 w-full -translate-y-full flex-row gap-5 rounded-lg bg-black/70 px-5 py-2.5 text-center font-semibold text-white"
+                  className={cn(
+                    "absolute -top-0 left-1/2 w-96 -translate-x-1/2 -translate-y-full flex-row gap-5 rounded-lg bg-black/90 px-5 py-2.5 text-center text-xl font-normal text-white",
+                    robotoFlex.className,
+                  )}
+                  style={{
+                    fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" 0`,
+                  }}
                 >
                   {message.message}
                 </motion.span>
