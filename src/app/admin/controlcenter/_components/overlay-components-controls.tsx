@@ -3,6 +3,7 @@
 import Group from "@/app/_components/group";
 import ComputerStates from "@/app/overlay/_components/computer-states";
 import GoNoGoPolls from "@/app/overlay/_components/go-nogo-polls";
+import KSPNavball from "@/app/overlay/_components/ksp-navball";
 import {
   Accordion,
   AccordionContent,
@@ -26,6 +27,7 @@ import z from "zod";
 const formSchema = z.object({
   polls: z.boolean(),
   lifesigns: z.boolean(),
+  kspNavball: z.boolean(),
 });
 
 const OverlayComponentsControls = ({
@@ -40,6 +42,7 @@ const OverlayComponentsControls = ({
     defaultValues: {
       polls: true,
       lifesigns: true,
+      kspNavball: false,
     },
   });
 
@@ -51,6 +54,9 @@ const OverlayComponentsControls = ({
       },
       signOfLife: {
         show: data.lifesigns,
+      },
+      kspNavball: {
+        show: data.kspNavball,
       },
     });
   };
@@ -102,6 +108,21 @@ const OverlayComponentsControls = ({
                     </div>
                   }
                   id="lifesigns"
+                  {...field}
+                />
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="kspNavball"
+              render={({ field }) => (
+                <OverlayComponent
+                  component={
+                    <div className="relative flex h-full w-full items-center justify-center overflow-hidden">
+                      <KSPNavball />
+                    </div>
+                  }
+                  id="kspNavball"
                   {...field}
                 />
               )}

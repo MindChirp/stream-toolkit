@@ -41,6 +41,9 @@ export type OverlayStateData = {
     show: boolean;
     sponsorIndex: number;
   };
+  kspNavball: {
+    show: boolean;
+  };
 };
 
 export class Overlay {
@@ -68,6 +71,7 @@ export class Overlay {
       show: false,
       sponsorIndex: 0,
     },
+    kspNavball: { show: false },
   };
 
   stateCheckpoint: OverlayStateData | undefined = undefined;
@@ -119,8 +123,11 @@ export class Overlay {
   }
 
   setSignOfLifeState(state: { show: boolean }) {
-    console.log("SIGNOFLIFE ", state);
     this.#state.signOfLife.show = state.show;
+  }
+
+  setKSPNavballState(state: { show: boolean }) {
+    this.#state.kspNavball.show = state.show;
   }
 
   setSponsorState(state: Partial<OverlayStateData["sponsor"]>) {
