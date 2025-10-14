@@ -4,6 +4,7 @@ export const SPONSORS: {
   bg: "white" | "black";
 }[] = [
   { source: "fieldmade.png", name: "Fieldmade", bg: "white" },
+  { source: "inventas.png", name: "Inventas", bg: "white" },
   { source: "gkn.png", name: "GKN Aerospace", bg: "white" },
   { source: "nammo.png", name: "Nammo", bg: "white" },
   {
