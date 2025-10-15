@@ -11,10 +11,10 @@ import { Azeret_Mono, Roboto_Flex } from "next/font/google";
 import Image from "next/image";
 import { type ComponentProps } from "react";
 import Gauge from "../gauge";
+import KSPNavball from "../ksp-navball";
 import MapGauge from "../map-gauge";
 import Navball from "../navball";
 import StateTimeline from "../state-timeline";
-import KSPNavball from "../ksp-navball";
 
 type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
   timestamp?: string;
@@ -39,8 +39,7 @@ type BottomTelemetryProps = ComponentProps<typeof motion.div> & {
     show: boolean;
     message?: string | null;
   };
-  fcFsmState?: number;
-  ecuFsmState?: number;
+  timelineIndex?: number;
   kspNavball?: boolean;
 };
 
@@ -65,8 +64,7 @@ const BottomTelemetry = ({
   clockState,
   message,
   position,
-  fcFsmState,
-  ecuFsmState,
+  timelineIndex,
   kspNavball,
   ...props
 }: BottomTelemetryProps) => {
@@ -232,7 +230,10 @@ const BottomTelemetry = ({
               <NumberFlow value={parseInt(clockState.time.slice(7, 8))} />
             </Header>
             <AnimatePresence>
-              <StateTimeline ecu_state={ecuFsmState} fc_state={fcFsmState} />
+              <StateTimeline
+                timelineIndex={timelineIndex}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full"
+              />
             </AnimatePresence>
           </div>
         </div>

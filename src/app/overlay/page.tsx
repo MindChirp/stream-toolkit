@@ -11,6 +11,10 @@ import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
 import { Roboto_Flex } from "next/font/google";
 import CutCornerWrapper from "./_components/cut-corner-wrapper";
+import StateTimeline from "./_components/state-timeline";
+import { useTimelineIndex } from "@/lib/hooks/useTimelineIndex";
+import { useEffect, useState } from "react";
+import { FSM_STATES } from "@/lib/telemetry/constants/fsm-states";
 
 const robotoFlex = Roboto_Flex({
   variable: "--font-azeret-mono",
@@ -25,6 +29,21 @@ const OverlayPage = () => {
   const { data: telemetry } = api.socket.onTelemetry.useSubscription();
   const { data: state } = api.socket.onOverlayState.useSubscription();
   const { data: time } = api.socket.onClock.useSubscription();
+  const [timelineIndex, setTimelineIndex] = useState(0);
+
+  // const timelineIndex = useTimelineIndex({
+  //   fcFsmState: (telemetry?.fc_state as number) ?? 0,
+  //   ecuFsmState: (telemetry?.ecu_state as number) ?? 0,
+  // });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimelineIndex((prev) => (prev + 1) % FSM_STATES.length);
+    }, 1500);
+
+    return () => {
+      interval.close();
+    };
+  }, []);
 
   return (
     <div className="relative flex h-screen max-h-screen w-full overflow-hidden">
@@ -246,6 +265,49 @@ const OverlayPage = () => {
           </motion.div>
         )} */}
       <AnimatePresence>
+        {(state?.state === "early-countdown" ||
+          state?.state == "post-flight") &&
+          timelineIndex !== undefined && (
+            <motion.div
+              className="absolute bottom-0 left-1/2 flex h-full w-full -translate-x-1/2 items-end justify-center"
+              key="early-timeline"
+              initial={{
+                bottom: "-10rem",
+                opacity: 0,
+              }}
+              animate={{
+                bottom: "0",
+                opacity: 1,
+              }}
+              exit={{
+                bottom: "-10rem",
+                opacity: 0,
+                transition: {
+                  duration: 3,
+                  ease: "easeInOut",
+                  type: "spring",
+                },
+              }}
+              transition={{
+                duration: 1,
+                ease: "easeInOut",
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+                delay: 2,
+              }}
+            >
+              <StateTimeline
+                className="relative z-20 mb-10"
+                timelineIndex={timelineIndex}
+                connectingLines
+                extraStates
+              />
+              <div className="absolute bottom-0 left-1/2 h-[20rem] w-[100%] -translate-x-1/2 translate-y-1/2 bg-gradient-to-t from-black to-transparent" />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
         {state?.state &&
           state?.state !== "post-flight" &&
           state?.state !== "early-countdown" && (
@@ -254,8 +316,7 @@ const OverlayPage = () => {
               gForce={
                 parseFloat((telemetry?.accelleration as string) ?? 0) / 9.81
               }
-              ecuFsmState={telemetry?.ecu_state as number}
-              fcFsmState={telemetry?.fc_state as number}
+              timelineIndex={timelineIndex}
               position={{
                 lat: telemetry?.lat as number,
                 lon: telemetry?.lon as number,

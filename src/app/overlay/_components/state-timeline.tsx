@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { motion } from "motion/react";
-import { useTimelineIndex } from "@/lib/hooks/useTimelineIndex";
+import { FSM_STATES } from "@/lib/telemetry/constants/fsm-states";
 import { cn } from "@/lib/utils";
+import { motion } from "motion/react";
 import { Roboto_Flex } from "next/font/google";
 import { type ComponentProps } from "react";
 
@@ -12,97 +12,113 @@ const robotoFlex = Roboto_Flex({
 });
 
 type StateTimelineProps = {
-  fc_state?: number;
-  ecu_state?: number;
+  timelineIndex?: number;
+  extraStates?: boolean;
+  connectingLines?: boolean;
 } & ComponentProps<typeof motion.div>;
 
-/**
- * ECU <= 2
- */
-
-const FSM_STATES = [
-  "Safe", //ECU State
-  "Fuel Fill", // ECU State
-  "Post Fuel Fill", // ECU State
-  "All Fill", // FC State
-  "Drogue Close", // FC State
-  "Main Close", // FC State
-  "Floatation Close", // FC State
-  "N2 Fill", // ECU State
-  "Post N2", // ECU State
-  "Ox Fill", // ECU State
-  "Post Ox", // ECU State
-  "Pressurized", // ECU State
-  "Armed", // ECU State
-  "Burn", // ECU State
-  "Coast", // FC State
-  "Drogue Chute", // FC State
-  "Main Chute", // FC State
-  "Flotation", // FC State
-  "Recovery", // FC State
-];
-
 const StateTimeline = ({
-  fc_state,
-  ecu_state,
+  timelineIndex,
   className,
+  extraStates,
+  connectingLines,
   ...props
 }: StateTimelineProps) => {
-  const index = useTimelineIndex({
-    fcFsmState: fc_state ?? 0,
-    ecuFsmState: ecu_state ?? 0,
-  });
+  const prevPrevIndex =
+    timelineIndex !== undefined && timelineIndex > 1
+      ? timelineIndex - 2
+      : undefined;
 
-  const prevIndex = index !== undefined && index > 0 ? index - 1 : undefined;
+  const prevIndex =
+    timelineIndex !== undefined && timelineIndex > 0
+      ? timelineIndex - 1
+      : undefined;
 
   const nextIndex =
-    index !== undefined && index < FSM_STATES.length ? index + 1 : undefined;
+    timelineIndex !== undefined && timelineIndex < FSM_STATES.length - 1
+      ? timelineIndex + 1
+      : undefined;
 
-  if (index == undefined) return undefined;
+  const nextNextIndex =
+    timelineIndex !== undefined && timelineIndex < FSM_STATES.length - 2
+      ? timelineIndex + 2
+      : undefined;
+
+  if (timelineIndex == undefined) return undefined;
   return (
-    <motion.div
-      key="timeline"
-      initial={{
-        y: 10,
-        opacity: 0,
-      }}
-      animate={{
-        y: 0,
-        opacity: 1,
-      }}
-      exit={{
-        y: 10,
-        opacity: 0,
-      }}
-      className={cn(
-        "absolute bottom-0 left-1/2 flex w-fit -translate-x-1/2 translate-y-full flex-row items-center justify-center text-center font-semibold whitespace-nowrap text-white",
-        className,
-      )}
-      {...props}
-    >
-      {prevIndex !== undefined && (
-        <span className="absolute -left-2.5 w-fit -translate-x-full text-end whitespace-nowrap">
-          {FSM_STATES[prevIndex]}
-        </span>
-      )}
-      <Badge variant={"secondary"} className="w-fit rounded-lg">
-        <span
-          className={cn("text-2xl font-bold uppercase", robotoFlex.className)}
-          style={{
-            fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
+    <>
+      {timelineIndex !== undefined && (
+        <motion.div
+          key="timeline"
+          initial={{
+            y: 10,
+            opacity: 0,
           }}
+          animate={{
+            y: 0,
+            opacity: 1,
+          }}
+          exit={{
+            y: 10,
+            opacity: 0,
+          }}
+          className={cn(
+            "flex w-fit flex-row items-center justify-center text-center font-semibold whitespace-nowrap text-white",
+            className,
+          )}
+          {...props}
         >
-          {index !== undefined && FSM_STATES[index]}
-          {index === undefined && "Unknown"}
-        </span>
-      </Badge>
-      {nextIndex !== undefined && (
-        <span className="absolute -right-2.5 w-fit translate-x-full text-end whitespace-nowrap">
-          {FSM_STATES[nextIndex]}
-        </span>
+          <div className="absolute -left-2.5 flex w-fit -translate-x-full flex-row items-center justify-center gap-5 whitespace-nowrap">
+            {prevPrevIndex !== undefined && extraStates && (
+              <>
+                <span className="w-fit">{FSM_STATES[prevPrevIndex]}</span>
+                {connectingLines && <TimelineLine />}
+              </>
+            )}
+
+            {prevIndex !== undefined && (
+              <>
+                <span className="w-fit">{FSM_STATES[prevIndex]}</span>
+                {connectingLines && <TimelineLine />}
+              </>
+            )}
+          </div>
+          <Badge variant={"secondary"} className="w-fit rounded-lg">
+            <span
+              className={cn(
+                "text-2xl font-bold uppercase",
+                robotoFlex.className,
+              )}
+              style={{
+                fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
+              }}
+            >
+              {timelineIndex !== undefined && FSM_STATES[timelineIndex]}
+              {timelineIndex === undefined && "Unknown"}
+            </span>
+          </Badge>
+          <div className="absolute -right-2.5 flex w-fit translate-x-full flex-row items-center justify-center gap-5 whitespace-nowrap">
+            {nextIndex !== undefined && (
+              <>
+                {connectingLines && <TimelineLine />}
+                <span className="w-fit">{FSM_STATES[nextIndex]}</span>
+              </>
+            )}
+            {nextNextIndex && extraStates !== undefined && (
+              <>
+                {connectingLines && <TimelineLine />}
+                <span className="w-fit">{FSM_STATES[nextNextIndex]}</span>
+              </>
+            )}
+          </div>
+        </motion.div>
       )}
-    </motion.div>
+    </>
   );
+};
+
+const TimelineLine = () => {
+  return <div className="h-0.5 w-10 bg-white" />;
 };
 
 export default StateTimeline;
