@@ -2,9 +2,10 @@ export const useTimelineIndex = ({
   ecuFsmState,
   fcFsmState,
 }: {
-  ecuFsmState: number;
-  fcFsmState: number;
+  ecuFsmState?: number;
+  fcFsmState?: number;
 }) => {
+  if (ecuFsmState == undefined || fcFsmState == undefined) return undefined;
   if (ecuFsmState >= 0 && ecuFsmState <= 2 && fcFsmState == 0) {
     return ecuFsmState;
   } else if (ecuFsmState === 2 && fcFsmState >= 1 && fcFsmState <= 4) {

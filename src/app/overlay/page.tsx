@@ -1,22 +1,46 @@
 "use client";
 
+import { useTimelineIndex } from "@/lib/hooks/useTimelineIndex";
 import { SPONSORS } from "@/lib/telemetry/constants/sponsors";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { AnimatePresence, motion } from "motion/react";
+import { Roboto_Flex } from "next/font/google";
 import Image from "next/image";
 import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
 import ComputerStates from "./_components/computer-states";
+import CutCornerWrapper from "./_components/cut-corner-wrapper";
 import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
+import StateTimeline from "./_components/state-timeline";
+
+const robotoFlex = Roboto_Flex({
+  variable: "--font-azeret-mono",
+  axes: ["GRAD", "wdth", "slnt"],
+  subsets: ["latin"],
+});
 
 const OverlayPage = () => {
-  // Current state of the UI from websockets
-  // Something wrong in this file
-  // const state = {};
   const { data: telemetry } = api.socket.onTelemetry.useSubscription();
   const { data: state } = api.socket.onOverlayState.useSubscription();
   const { data: time } = api.socket.onClock.useSubscription();
+
+  // const [timelineIndex, setTimelineIndex] = useState(0);
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimelineIndex((prev) => (prev + 1) % FSM_STATES.length);
+  //   }, 1500);
+
+  //   return () => {
+  //     interval.close();
+  //   };
+  // }, []);
+
+  const timelineIndex = useTimelineIndex({
+    fcFsmState: telemetry?.fc_state as number,
+    ecuFsmState: telemetry?.ecu_state as number,
+  });
 
   return (
     <div className="relative flex h-screen max-h-screen w-full overflow-hidden">
@@ -130,7 +154,7 @@ const OverlayPage = () => {
             )}
           </AnimatePresence>
         </div>
-        <div className="mt-5 h-12">
+        <div className="mt-5 h-[4.5rem]">
           <AnimatePresence>
             {state?.state === "early-countdown" && (
               <SmallCountdown
@@ -153,6 +177,50 @@ const OverlayPage = () => {
             )}
           </AnimatePresence>
         </div>
+
+        <div className="relative z-20 mt-5 min-h-[4rem]">
+          <AnimatePresence>
+            {state?.message.show &&
+              (state?.state === "early-countdown" ||
+                state?.state == "post-flight") && (
+                <motion.div
+                  key="overlay-message"
+                  initial={{
+                    x: "100%",
+                  }}
+                  animate={{
+                    x: 0,
+                  }}
+                  exit={{
+                    x: "100%",
+                    transition: {
+                      duration: 0.5,
+                      delay: 0.1,
+                      ease: "easeIn",
+                    },
+                  }}
+                  transition={{ duration: 1, ease: "circOut", delay: 1 }}
+                  className="lg max-w-96 rounded-tl-lg rounded-bl-3xl text-xl font-normal text-wrap text-white"
+                >
+                  <CutCornerWrapper
+                    cutSize={20}
+                    corner="bottomLeft"
+                    className="bg-black/80 px-10 py-5"
+                  >
+                    <span
+                      className={cn("text-lg", robotoFlex.className)}
+                      style={{
+                        fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" 0`,
+                      }}
+                    >
+                      {state.message.message}
+                    </span>
+                  </CutCornerWrapper>
+                </motion.div>
+              )}
+          </AnimatePresence>
+        </div>
+
         <div key="checklist-wrapper" className="mt-5 h-[21rem]">
           <AnimatePresence>
             {state?.goNoGoPolls?.show && (
@@ -164,33 +232,6 @@ const OverlayPage = () => {
             )}
           </AnimatePresence>
         </div>
-        <AnimatePresence>
-          {state?.message.show &&
-            (state?.state === "early-countdown" ||
-              state?.state == "post-flight") && (
-              <motion.div
-                key="overlay-message"
-                initial={{
-                  x: "100%",
-                }}
-                animate={{
-                  x: 0,
-                }}
-                exit={{
-                  x: "100%",
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.1,
-                    ease: "easeIn",
-                  },
-                }}
-                transition={{ duration: 1, ease: "circOut", delay: 1 }}
-                className="lg mt-5 max-w-96 rounded-tl-lg rounded-bl-3xl bg-black/90 px-10 py-5 text-wrap text-white"
-              >
-                <span className="text-lg">{state.message.message}</span>
-              </motion.div>
-            )}
-        </AnimatePresence>
       </div>
 
       {/* {state?.state == "early-countdown" && (
@@ -223,6 +264,49 @@ const OverlayPage = () => {
           </motion.div>
         )} */}
       <AnimatePresence>
+        {(state?.state === "early-countdown" ||
+          state?.state == "post-flight") &&
+          timelineIndex !== undefined && (
+            <motion.div
+              className="absolute bottom-0 left-1/2 flex h-full w-full -translate-x-1/2 items-end justify-center"
+              key="early-timeline"
+              initial={{
+                bottom: "-10rem",
+                opacity: 0,
+              }}
+              animate={{
+                bottom: "0",
+                opacity: 1,
+              }}
+              exit={{
+                bottom: "-10rem",
+                opacity: 0,
+                transition: {
+                  duration: 3,
+                  ease: "easeInOut",
+                  type: "spring",
+                },
+              }}
+              transition={{
+                duration: 1,
+                ease: "easeInOut",
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+                delay: 2,
+              }}
+            >
+              <StateTimeline
+                className="relative z-20 mb-10"
+                timelineIndex={timelineIndex}
+                connectingLines
+                extraStates
+              />
+              <div className="absolute bottom-0 left-1/2 h-[20rem] w-[100%] -translate-x-1/2 translate-y-1/2 bg-gradient-to-t from-black to-transparent" />
+            </motion.div>
+          )}
+      </AnimatePresence>
+      <AnimatePresence>
         {state?.state &&
           state?.state !== "post-flight" &&
           state?.state !== "early-countdown" && (
@@ -231,8 +315,7 @@ const OverlayPage = () => {
               gForce={
                 parseFloat((telemetry?.accelleration as string) ?? 0) / 9.81
               }
-              ecuFsmState={telemetry?.ecu_state as number}
-              fcFsmState={telemetry?.fc_state as number}
+              timelineIndex={timelineIndex}
               position={{
                 lat: telemetry?.lat as number,
                 lon: telemetry?.lon as number,

@@ -58,7 +58,7 @@ const Ball = ({
   // Recompute the target quaternion whenever inputs change.
   // Mapping: pitch->X, yaw->Y, roll->Z (THREE default order 'XYZ').
   const targetQuat = useMemo(() => {
-    const e = new THREE.Euler(deg(pitch), deg(yaw), deg(roll), "XYZ");
+    const e = new THREE.Euler(deg(-pitch), deg(-yaw), deg(-roll), "XYZ");
     const q = new THREE.Quaternion();
     q.setFromEuler(e);
     return q;

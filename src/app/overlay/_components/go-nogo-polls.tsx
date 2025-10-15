@@ -3,6 +3,7 @@ import { PollState, type OverlayStateData } from "@/server/api/types/overlay";
 import { motion } from "motion/react";
 import { Roboto_Flex } from "next/font/google";
 import { type ComponentProps } from "react";
+import CutCornerWrapper from "./cut-corner-wrapper";
 
 type GoNoGoPollsProps = {
   state: NonNullable<OverlayStateData["goNoGoPolls"]>["states"];
@@ -33,32 +34,31 @@ const GoNoGoPolls = ({ state, className, ...props }: GoNoGoPollsProps) => {
         },
       }}
       transition={{ duration: 1, ease: "circOut" }}
-      className={cn(
-        "flex flex-col gap-1 rounded-tl-lg rounded-bl-3xl bg-black/90 px-10 py-5",
-        className,
-      )}
+      className={cn("", className)}
       {...props}
     >
-      <span
-        className={cn(
-          "mb-2 text-2xl font-semibold text-white",
-          robotoFlex.className,
-        )}
-        style={{
-          fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
-        }}
-      >
-        Checklist
-      </span>
+      <CutCornerWrapper className="flex flex-col gap-1 bg-black/80 px-10 py-5">
+        <span
+          className={cn(
+            "mb-2 text-2xl font-semibold text-white",
+            robotoFlex.className,
+          )}
+          style={{
+            fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
+          }}
+        >
+          Checklist
+        </span>
 
-      <State type="Propulsion" state={state.propulsion} />
-      <State type="Recovery" state={state.recovery} />
-      <State type="Range" state={state.range} />
-      <State type="Pad" state={state.pad} />
-      <State type="Telemetry" state={state.telemetry} />
-      <State type="Trajectory" state={state.trajectory} />
-      <State type="Pyro" state={state.pyro} />
-      <State type="Operations" state={state.operations} />
+        <State type="Propulsion" state={state.propulsion} />
+        <State type="Recovery" state={state.recovery} />
+        <State type="Range" state={state.range} />
+        <State type="Pad" state={state.pad} />
+        <State type="Telemetry" state={state.telemetry} />
+        <State type="Trajectory" state={state.trajectory} />
+        <State type="Pyro" state={state.pyro} />
+        <State type="Operations" state={state.operations} />
+      </CutCornerWrapper>
     </motion.div>
   );
 };

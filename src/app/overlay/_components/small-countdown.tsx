@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { Roboto_Flex } from "next/font/google";
 import { type ComponentProps } from "react";
+import CutCornerWrapper from "./cut-corner-wrapper";
 
 type SmallCountdownProps = {
   preLaunch?: boolean;
@@ -46,7 +47,7 @@ const SmallCountdown = ({
           duration: 2,
         }}
         className={cn(
-          "absolute top-80 right-0 z-10 size-[700px] translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full",
+          "absolute top-60 right-0 z-10 size-[700px] translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full",
           !background ? "hidden" : undefined,
         )}
         style={{
@@ -78,11 +79,12 @@ const SmallCountdown = ({
         )}
         {...props}
       >
-        <div
-          className="rounded-tl-lg rounded-bl-3xl bg-black/90 px-14 py-2 leading-none font-semibold text-white"
+        <CutCornerWrapper
+          cutSize={20}
           style={{
             fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
           }}
+          className="bg-black/90 px-14 py-5 leading-none font-semibold text-white"
         >
           <span className="mr-3 text-lg text-white/70">
             {preLaunch ? "T-" : "T+"}
@@ -90,7 +92,7 @@ const SmallCountdown = ({
           <span className="text-2xl">
             {time.slice(0, 2)}:{time.slice(2, 4)}:{time.slice(4, 6)}
           </span>
-        </div>
+        </CutCornerWrapper>
         {/* <h2 className="w-full text-center font-semibold text-white">
           Heimdall
         </h2> */}

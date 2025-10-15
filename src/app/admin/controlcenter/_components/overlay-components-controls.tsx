@@ -40,7 +40,7 @@ const OverlayComponentsControls = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      polls: true,
+      polls: false,
       lifesigns: true,
       kspNavball: false,
     },
