@@ -9,10 +9,10 @@ enum Rocket {
 }
 
 // eslint-disable-next-line prefer-const
-let adapter: Rocket = Rocket.BIFROST;
+let adapter: Rocket = Rocket.HEIMDALL;
 
 const handler =
-  // @ts-expect-error: intentional runtime-only branch
+  // // @ts-expect-error: intentional runtime-only branch
   adapter === Rocket.HEIMDALL
     ? new ServerEventHandlerHeimdall()
     : new ServerEventHandlerRetrofit();
