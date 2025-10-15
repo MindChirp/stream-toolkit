@@ -37,7 +37,7 @@ const GoNoGoPolls = ({ state, className, ...props }: GoNoGoPollsProps) => {
       className={cn("", className)}
       {...props}
     >
-      <CutCornerWrapper className="flex flex-col gap-1 bg-black/90 px-10 py-5">
+      <CutCornerWrapper className="flex flex-col gap-1 bg-black/80 px-10 py-5">
         <span
           className={cn(
             "mb-2 text-2xl font-semibold text-white",

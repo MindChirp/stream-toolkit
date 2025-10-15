@@ -34,7 +34,7 @@ const ComputerStates = ({ ecu, fc, className }: ComputerStatesProps) => {
       transition={{ duration: 1, ease: "circOut" }}
       className={cn("z-20 w-fit", robotoFlex.className, className)}
     >
-      <CutCornerWrapper className="flex flex-col bg-black/90 px-16 py-2 leading-none font-semibold text-white">
+      <CutCornerWrapper className="flex flex-col bg-black/80 px-16 py-2 leading-none font-semibold text-white">
         <span className="flex flex-row items-center justify-between gap-2.5 text-2xl">
           ECU <IndicatorCircle active={ecu} />
         </span>

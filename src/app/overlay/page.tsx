@@ -138,7 +138,7 @@ const OverlayPage = () => {
             )}
           </AnimatePresence>
         </div>
-        <div className="mt-5 h-12">
+        <div className="mt-5 h-[4.5rem]">
           <AnimatePresence>
             {state?.state === "early-countdown" && (
               <SmallCountdown
@@ -188,7 +188,7 @@ const OverlayPage = () => {
                   <CutCornerWrapper
                     cutSize={20}
                     corner="bottomLeft"
-                    className="bg-black/90 px-10 py-5"
+                    className="bg-black/80 px-10 py-5"
                   >
                     <span
                       className={cn("text-lg", robotoFlex.className)}
