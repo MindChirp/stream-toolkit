@@ -84,7 +84,7 @@ const SmallCountdown = ({
           style={{
             fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" -100`,
           }}
-          className="bg-black/90 px-14 py-2 leading-none font-semibold text-white"
+          className="bg-black/90 px-14 py-5 leading-none font-semibold text-white"
         >
           <span className="mr-3 text-lg text-white/70">
             {preLaunch ? "T-" : "T+"}
