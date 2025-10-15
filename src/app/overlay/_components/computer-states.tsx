@@ -34,19 +34,20 @@ const ComputerStates = ({ ecu, fc, className }: ComputerStatesProps) => {
       transition={{ duration: 1, ease: "circOut" }}
       className={cn("z-20 w-fit", robotoFlex.className, className)}
     >
-      <div className="flex flex-col rounded-tl-lg rounded-bl-3xl bg-black/90 px-16 py-2 leading-none font-semibold text-white">
+      <CutCornerWrapper className="flex flex-col bg-black/90 px-16 py-2 leading-none font-semibold text-white">
         <span className="flex flex-row items-center justify-between gap-2.5 text-2xl">
           ECU <IndicatorCircle active={ecu} />
         </span>
         <span className="flex flex-row items-center justify-between gap-2.5 text-2xl">
           FC <IndicatorCircle active={fc} />
         </span>
-      </div>
+      </CutCornerWrapper>
     </motion.div>
   );
 };
 
 import React from "react";
+import CutCornerWrapper from "./cut-corner-wrapper";
 
 export const IndicatorCircle = ({ active }: { active?: boolean }) => {
   return (

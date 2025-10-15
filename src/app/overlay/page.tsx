@@ -9,6 +9,14 @@ import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
 import ComputerStates from "./_components/computer-states";
 import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
+import { Roboto_Flex } from "next/font/google";
+import CutCornerWrapper from "./_components/cut-corner-wrapper";
+
+const robotoFlex = Roboto_Flex({
+  variable: "--font-azeret-mono",
+  axes: ["GRAD", "wdth", "slnt"],
+  subsets: ["latin"],
+});
 
 const OverlayPage = () => {
   // Current state of the UI from websockets
@@ -153,6 +161,48 @@ const OverlayPage = () => {
             )}
           </AnimatePresence>
         </div>
+        <div className="relative z-20 mt-5 min-h-[4rem]">
+          <AnimatePresence>
+            {state?.message.show &&
+              (state?.state === "early-countdown" ||
+                state?.state == "post-flight") && (
+                <motion.div
+                  key="overlay-message"
+                  initial={{
+                    x: "100%",
+                  }}
+                  animate={{
+                    x: 0,
+                  }}
+                  exit={{
+                    x: "100%",
+                    transition: {
+                      duration: 0.5,
+                      delay: 0.1,
+                      ease: "easeIn",
+                    },
+                  }}
+                  transition={{ duration: 1, ease: "circOut", delay: 1 }}
+                  className="lg max-w-96 rounded-tl-lg rounded-bl-3xl text-xl font-normal text-wrap text-white"
+                >
+                  <CutCornerWrapper
+                    cutSize={20}
+                    corner="bottomLeft"
+                    className="bg-black/90 px-10 py-5"
+                  >
+                    <span
+                      className={cn("text-lg", robotoFlex.className)}
+                      style={{
+                        fontVariationSettings: `"GRAD" 50, "wdth" 200, "slnt" 0`,
+                      }}
+                    >
+                      {state.message.message}
+                    </span>
+                  </CutCornerWrapper>
+                </motion.div>
+              )}
+          </AnimatePresence>
+        </div>
         <div key="checklist-wrapper" className="mt-5 h-[21rem]">
           <AnimatePresence>
             {state?.goNoGoPolls?.show && (
@@ -164,33 +214,6 @@ const OverlayPage = () => {
             )}
           </AnimatePresence>
         </div>
-        <AnimatePresence>
-          {state?.message.show &&
-            (state?.state === "early-countdown" ||
-              state?.state == "post-flight") && (
-              <motion.div
-                key="overlay-message"
-                initial={{
-                  x: "100%",
-                }}
-                animate={{
-                  x: 0,
-                }}
-                exit={{
-                  x: "100%",
-                  transition: {
-                    duration: 0.5,
-                    delay: 0.1,
-                    ease: "easeIn",
-                  },
-                }}
-                transition={{ duration: 1, ease: "circOut", delay: 1 }}
-                className="lg mt-5 max-w-96 rounded-tl-lg rounded-bl-3xl bg-black/90 px-10 py-5 text-wrap text-white"
-              >
-                <span className="text-lg">{state.message.message}</span>
-              </motion.div>
-            )}
-        </AnimatePresence>
       </div>
 
       {/* {state?.state == "early-countdown" && (
