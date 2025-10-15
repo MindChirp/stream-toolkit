@@ -1,20 +1,18 @@
 "use client";
 
+import { useTimelineIndex } from "@/lib/hooks/useTimelineIndex";
 import { SPONSORS } from "@/lib/telemetry/constants/sponsors";
 import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { AnimatePresence, motion } from "motion/react";
+import { Roboto_Flex } from "next/font/google";
 import Image from "next/image";
 import BottomTelemetry from "./_components/bottom-telemetry/bottom-telemetry";
 import ComputerStates from "./_components/computer-states";
+import CutCornerWrapper from "./_components/cut-corner-wrapper";
 import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
-import { Roboto_Flex } from "next/font/google";
-import CutCornerWrapper from "./_components/cut-corner-wrapper";
 import StateTimeline from "./_components/state-timeline";
-import { useTimelineIndex } from "@/lib/hooks/useTimelineIndex";
-import { useEffect, useState } from "react";
-import { FSM_STATES } from "@/lib/telemetry/constants/fsm-states";
 
 const robotoFlex = Roboto_Flex({
   variable: "--font-azeret-mono",
@@ -23,27 +21,26 @@ const robotoFlex = Roboto_Flex({
 });
 
 const OverlayPage = () => {
-  // Current state of the UI from websockets
-  // Something wrong in this file
-  // const state = {};
   const { data: telemetry } = api.socket.onTelemetry.useSubscription();
   const { data: state } = api.socket.onOverlayState.useSubscription();
   const { data: time } = api.socket.onClock.useSubscription();
-  const [timelineIndex, setTimelineIndex] = useState(0);
 
-  // const timelineIndex = useTimelineIndex({
-  //   fcFsmState: (telemetry?.fc_state as number) ?? 0,
-  //   ecuFsmState: (telemetry?.ecu_state as number) ?? 0,
-  // });
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimelineIndex((prev) => (prev + 1) % FSM_STATES.length);
-    }, 1500);
+  // const [timelineIndex, setTimelineIndex] = useState(0);
 
-    return () => {
-      interval.close();
-    };
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setTimelineIndex((prev) => (prev + 1) % FSM_STATES.length);
+  //   }, 1500);
+
+  //   return () => {
+  //     interval.close();
+  //   };
+  // }, []);
+
+  const timelineIndex = useTimelineIndex({
+    fcFsmState: telemetry?.fc_state as number,
+    ecuFsmState: telemetry?.ecu_state as number,
+  });
 
   return (
     <div className="relative flex h-screen max-h-screen w-full overflow-hidden">
@@ -180,6 +177,7 @@ const OverlayPage = () => {
             )}
           </AnimatePresence>
         </div>
+
         <div className="relative z-20 mt-5 min-h-[4rem]">
           <AnimatePresence>
             {state?.message.show &&
@@ -222,6 +220,7 @@ const OverlayPage = () => {
               )}
           </AnimatePresence>
         </div>
+
         <div key="checklist-wrapper" className="mt-5 h-[21rem]">
           <AnimatePresence>
             {state?.goNoGoPolls?.show && (
