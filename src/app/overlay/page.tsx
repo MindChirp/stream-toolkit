@@ -13,6 +13,7 @@ import CutCornerWrapper from "./_components/cut-corner-wrapper";
 import GoNoGoPolls from "./_components/go-nogo-polls";
 import SmallCountdown from "./_components/small-countdown";
 import StateTimeline from "./_components/state-timeline";
+import { AnimateChangeInHeight } from "@/components/ui/animate-height";
 
 const robotoFlex = Roboto_Flex({
   variable: "--font-azeret-mono",
@@ -101,13 +102,30 @@ const OverlayPage = () => {
                 : "bg-white/70",
             )}
           >
-            <Image
-              src={`/images/sponsors/${SPONSORS[state.sponsor.sponsorIndex]?.source}`}
-              alt="Sponsor"
-              className="h-fit w-96 object-cover"
-              width={1000}
-              height={1000}
-            />
+            <AnimateChangeInHeight>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={SPONSORS[state.sponsor.sponsorIndex]?.source ?? ""}
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{
+                    x: 0,
+                    opacity: 1,
+                    transition: {
+                      delay: 1.5,
+                    },
+                  }}
+                  exit={{ x: -20, opacity: 0 }}
+                >
+                  <Image
+                    src={`/images/sponsors/${SPONSORS[state.sponsor.sponsorIndex]?.source}`}
+                    alt="Sponsor"
+                    className="h-fit w-96 object-cover"
+                    width={1000}
+                    height={1000}
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </AnimateChangeInHeight>
           </motion.div>
         )}
       </AnimatePresence>
