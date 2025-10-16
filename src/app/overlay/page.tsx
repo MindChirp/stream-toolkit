@@ -106,7 +106,7 @@ const OverlayPage = () => {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={SPONSORS[state.sponsor.sponsorIndex]?.source ?? ""}
-                  initial={{ x: 20, opacity: 0 }}
+                  initial={{ x: 40, opacity: 0 }}
                   animate={{
                     x: 0,
                     opacity: 1,
@@ -114,7 +114,7 @@ const OverlayPage = () => {
                       delay: 1.5,
                     },
                   }}
-                  exit={{ x: -20, opacity: 0 }}
+                  exit={{ x: -40, opacity: 0 }}
                 >
                   <Image
                     src={`/images/sponsors/${SPONSORS[state.sponsor.sponsorIndex]?.source}`}
