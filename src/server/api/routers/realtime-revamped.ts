@@ -163,18 +163,22 @@ export const realtimeRouterRevamped = createTRPCRouter({
     )
     .mutation(({ input }) => {
       if (input.state) {
+        hideSponsor();
         OverlayInstance.setOverlayState(input.state);
       }
 
       if (input.goNoGoPolls) {
+        if (input.goNoGoPolls.show) hideSponsor();
         OverlayInstance.setGoNoGoPollState(input.goNoGoPolls);
       }
 
       if (input.message) {
+        if (input.message.show) hideSponsor();
         OverlayInstance.setMessageState(input.message);
       }
 
       if (input.signOfLife) {
+        if (input.signOfLife.show) hideSponsor();
         OverlayInstance.setSignOfLifeState(input.signOfLife);
       }
       if (input.kspNavball) {
@@ -322,3 +326,7 @@ export const realtimeRouterRevamped = createTRPCRouter({
       return;
     }),
 });
+
+const hideSponsor = () => {
+  OverlayInstance.setSponsorState({ show: false });
+};
